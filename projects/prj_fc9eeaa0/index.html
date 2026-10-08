@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<title>Transformers — Attention Is All You Need</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #070a12;
+    color: #f8fafc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    overflow: hidden;
+  }
+
+  /* Canvas sizing is driven by data-width / data-height only */
+  #root {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: radial-gradient(120% 90% at 50% 0%, #131a2e 0%, #0a0e1a 45%, #06080f 100%);
+  }
+
+  .clip {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* ---------- shared decor ---------- */
+  .glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    pointer-events: none;
+  }
+  .glow-a { width: 900px; height: 900px; top: -320px; left: -220px; background: rgba(99,102,241,0.22); }
+  .glow-b { width: 800px; height: 800px; bottom: -340px; right: -200px; background: rgba(6,182,212,0.18); }
+  .glow-c { width: 620px; height: 620px; top: 30%; left: 55%; background: rgba(16,185,129,0.12); }
+
+  .grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(148,163,184,0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(148,163,184,0.05) 1px, transparent 1px);
+    background-size: 96px 96px;
+    mask-image: radial-gradient(80% 70% at 50% 45%, #000 30%, transparent 100%);
+    -webkit-mask-image: radial-gradient(80% 70% at 50% 45%, #000 30%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 22px;
+    border-radius: 9999px;
+    background: rgba(99,102,241,0.14);
+    border: 1px solid rgba(129,140,248,0.45);
+    color: #a5b4fc;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #22d3ee; box-shadow: 0 0 14px #22d3ee; }
+
+  .headline {
+    font-size: 92px;
+    font-weight: 800;
+    line-height: 1.06;
+    letter-spacing: -0.025em;
+    text-align: center;
+    background: linear-gradient(150deg, #ffffff 35%, #cbd5e1 70%, #8ea2ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .accent { color: #22d3ee; -webkit-text-fill-color: #22d3ee; }
+  .accent-i { color: #818cf8; -webkit-text-fill-color: #818cf8; }
+
+  .subline {
+    margin-top: 26px;
+    font-size: 31px;
+    font-weight: 400;
+    line-height: 1.45;
+    color: #94a3b8;
+    text-align: center;
+    max-width: 1080px;
+  }
+
+  /* ---------- Scene 1 : hook ---------- */
+  #scene-hook { gap: 0; }
+  .hook-inner { display: flex; flex-direction: column; align-items: center; }
+  .hook-line { display: block; }
+  .hook-word { display: inline-block; }
+
+  /* token strip under the hook */
+  .tokens {
+    display: flex;
+    gap: 14px;
+    margin-top: 46px;
+    align-items: center;
+  }
+  .token {
+    padding: 12px 22px;
+    border-radius: 12px;
+    background: rgba(148,163,184,0.08);
+    border: 1px solid rgba(148,163,184,0.22);
+    font-size: 24px;
+    font-weight: 600;
+    color: #cbd5e1;
+  }
+  .token.hot {
+    background: rgba(34,211,238,0.14);
+    border-color: rgba(34,211,238,0.55);
+    color: #67e8f9;
+    box-shadow: 0 0 26px rgba(34,211,238,0.25);
+  }
+  .arrow-right { font-size: 26px; color: #475569; }
+
+  /* ---------- Scene 2 : 2017 / attention ---------- */
+  #scene-2017 { flex-direction: row; gap: 110px; }
+  .left-col { display: flex; flex-direction: column; align-items: flex-start; max-width: 760px; }
+  .year {
+    font-size: 150px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    background: linear-gradient(180deg, #22d3ee 0%, #6366f1 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .kicker { font-size: 22px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: #64748b; margin-bottom: 18px; }
+  .h2 { font-size: 62px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+  .body-copy { margin-top: 22px; font-size: 27px; line-height: 1.55; color: #94a3b8; max-width: 700px; }
+
+  /* attention diagram card */
+  .attn-card {
+    position: relative;
+    width: 620px;
+    height: 520px;
+    border-radius: 26px;
+    padding: 40px 44px;
+    background: linear-gradient(160deg, rgba(23,31,54,0.92), rgba(11,15,28,0.92));
+    border: 1px solid rgba(129,140,248,0.28);
+    box-shadow: 0 30px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column;
+  }
+  .attn-title { font-size: 20px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #7dd3fc; }
+  .attn-svg { flex: 1; width: 100%; margin-top: 10px; }
+  .node-label { font-size: 21px; font-weight: 600; fill: #cbd5e1; font-family: inherit; }
+  .node-dot { fill: #1e293b; stroke: rgba(148,163,184,0.5); stroke-width: 1.5; }
+  .node-dot.active { fill: #0e7490; stroke: #22d3ee; }
+
+  /* ---------- Scene 3 : parallel vs sequential ---------- */
+  #scene-parallel { gap: 54px; }
+  .compare { display: flex; gap: 40px; align-items: stretch; }
+  .panel {
+    width: 560px;
+    border-radius: 22px;
+    padding: 34px 38px;
+    background: rgba(15,20,36,0.72);
+    border: 1px solid rgba(148,163,184,0.16);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+  }
+  .panel.win {
+    background: linear-gradient(160deg, rgba(16,185,129,0.12), rgba(15,20,36,0.8));
+    border-color: rgba(16,185,129,0.45);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 0 46px rgba(16,185,129,0.14);
+  }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 26px; }
+  .panel-name { font-size: 26px; font-weight: 700; color: #e2e8f0; }
+  .tag { font-size: 16px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 14px; border-radius: 9999px; }
+  .tag.slow { background: rgba(244,63,94,0.14); color: #fb7185; border: 1px solid rgba(244,63,94,0.4); }
+  .tag.fast { background: rgba(16,185,129,0.16); color: #34d399; border: 1px solid rgba(16,185,129,0.45); }
+
+  .seq-row { display: flex; align-items: center; gap: 10px; }
+  .chip {
+    width: 58px; height: 58px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700;
+    background: rgba(148,163,184,0.1);
+    border: 1px solid rgba(148,163,184,0.24);
+    color: #94a3b8;
+  }
+  .chip.on { background: rgba(99,102,241,0.28); border-color: rgba(129,140,248,0.7); color: #e0e7ff; }
+  .chip.green { background: rgba(16,185,129,0.22); border-color: rgba(52,211,153,0.65); color: #d1fae5; }
+  .chev { font-size: 20px; color: #475569; }
+
+  .stack { display: flex; flex-direction: column; gap: 12px; }
+  .bar { height: 44px; border-radius: 12px; background: rgba(16,185,129,0.16); border: 1px solid rgba(52,211,153,0.4); }
+  .bar:nth-child(1) { width: 100%; }
+  .bar:nth-child(2) { width: 86%; }
+  .bar:nth-child(3) { width: 72%; }
+
+  .vs {
+    align-self: center;
+    font-size: 30px; font-weight: 800; color: #475569;
+    letter-spacing: 0.1em;
+  }
+
+  /* ---------- Scene 4 : ecosystem ---------- */
+  #scene-power { gap: 52px; }
+  .cards { display: flex; gap: 30px; }
+  .use-card {
+    width: 320px;
+    border-radius: 20px;
+    padding: 30px 28px;
+    text-align: left;
+    background: linear-gradient(165deg, rgba(26,34,58,0.9), rgba(11,15,28,0.9));
+    border: 1px solid rgba(129,140,248,0.22);
+    box-shadow: 0 22px 50px rgba(0,0,0,0.5);
+  }
+  .icon-wrap {
+    width: 62px; height: 62px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; margin-bottom: 20px;
+    background: rgba(34,211,238,0.12);
+    border: 1px solid rgba(34,211,238,0.35);
+  }
+  .use-card:nth-child(2) .icon-wrap { background: rgba(99,102,241,0.14); border-color: rgba(129,140,248,0.4); }
+  .use-card:nth-child(3) .icon-wrap { background: rgba(16,185,129,0.14); border-color: rgba(52,211,153,0.4); }
+  .use-name { font-size: 27px; font-weight: 700; color: #f1f5f9; }
+  .use-desc { margin-top: 8px; font-size: 19px; line-height: 1.4; color: #8b9bb4; }
+
+  .foundation-note { font-size: 26px; color: #7c8ba3; }
+  .foundation-note b { color: #a5b4fc; font-weight: 700; }
+
+  /* ---------- Scene 5 : outro paper ---------- */
+  #scene-outro { gap: 44px; }
+  .paper {
+    position: relative;
+    width: 1060px;
+    padding: 46px 56px 44px;
+    border-radius: 24px;
+    background: linear-gradient(170deg, rgba(20,27,48,0.95), rgba(9,13,24,0.95));
+    border: 1px solid rgba(34,211,238,0.32);
+    box-shadow: 0 34px 90px rgba(0,0,0,0.6), 0 0 70px rgba(99,102,241,0.16);
+    text-align: center;
+  }
+  .paper-over { font-size: 19px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: #22d3ee; }
+  .paper-title {
+    margin-top: 18px;
+    font-size: 74px;
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    background: linear-gradient(120deg, #ffffff 30%, #7dd3fc 60%, #818cf8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .paper-meta { margin-top: 20px; font-size: 22px; color: #7c8ba3; letter-spacing: 0.04em; }
+  .rule { width: 120px; height: 3px; margin: 22px auto 0; border-radius: 3px; background: linear-gradient(90deg, #22d3ee, #6366f1); }
+
+  .cta { display: flex; align-items: center; gap: 18px; font-size: 27px; font-weight: 600; color: #cbd5e1; }
+  .cta-pill {
+    padding: 12px 26px; border-radius: 9999px;
+    background: linear-gradient(120deg, #6366f1, #22d3ee);
+    color: #06121a; font-weight: 800; font-size: 21px; letter-spacing: 0.06em;
+    box-shadow: 0 14px 34px rgba(34,211,238,0.28);
+  }
+
+  /* vignette on top of everything */
+  .vignette {
+    position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(115% 85% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%);
+  }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="15">
+
+  <!-- ============ BEAT 1 · HOOK (0–3s) ============ -->
+  <section id="scene-hook" class="clip" data-start="0" data-duration="3">
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+    <div class="grid-lines"></div>
+
+    <div class="hook-inner">
+      <div id="hook-badge" class="badge"><span class="dot"></span>The idea behind AI</div>
+      <h1 class="headline">
+        <span class="hook-line"><span class="hook-word">What if a machine could understand</span></span>
+        <span class="hook-line"><span class="hook-word">the <span class="accent">relationship between every word</span></span></span>
+        <span class="hook-line"><span class="hook-word">in a sentence?</span></span>
+      </h1>
+      <div class="tokens" id="tokens">
+        <span class="token">The</span><span class="token hot">animal</span><span class="token">didn't</span>
+        <span class="token">cross</span><span class="token">the</span><span class="token hot">street</span>
+        <span class="token">because</span><span class="token hot">it</span><span class="token">was</span><span class="token">tired</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BEAT 2 · 2017 / ATTENTION (3–6.5s) ============ -->
+  <section id="scene-2017" class="clip" data-start="3" data-duration="3.5">
+    <div class="glow glow-a"></div>
+    <div class="glow glow-c"></div>
+    <div class="grid-lines"></div>
+
+    <div class="left-col">
+      <div class="kicker" id="kick2">Introduced in</div>
+      <div class="year" id="year2">2017</div>
+      <h2 class="h2" id="h2b">The <span class="accent-i">Transformer</span><br/>changed AI.</h2>
+      <p class="body-copy" id="body2">One mechanism does the work: <b style="color:#67e8f9">attention</b>. Not a single word at a time — the whole sequence, at once.</p>
+    </div>
+
+    <div class="attn-card" id="attnCard">
+      <div class="attn-title">Self-Attention · every token ↔ every token</div>
+      <svg class="attn-svg" viewBox="0 0 520 400" fill="none">
+        <!-- connection lines -->
+        <g stroke-width="2.5" stroke-linecap="round">
+          <line class="w1" x1="60" y1="60"  x2="460" y2="60"  stroke="#6366f1" opacity="0.5"/>
+          <line class="w2" x1="60" y1="60"  x2="460" y2="140" stroke="#22d3ee" opacity="0.85"/>
+          <line class="w3" x1="60" y1="60"  x2="460" y2="220" stroke="#6366f1" opacity="0.35"/>
+          <line class="w4" x1="60" y1="60"  x2="460" y2="300" stroke="#10b981" opacity="0.7"/>
+          <line class="w5" x1="60" y1="140" x2="460" y2="60"  stroke="#22d3ee" opacity="0.4"/>
+          <line class="w6" x1="60" y1="140" x2="460" y2="140" stroke="#6366f1" opacity="0.8"/>
+          <line class="w7" x1="60" y1="140" x2="460" y2="220" stroke="#6366f1" opacity="0.3"/>
+          <line class="w8" x1="60" y1="140" x2="460" y2="300" stroke="#22d3ee" opacity="0.55"/>
+          <line class="w9" x1="60" y1="220" x2="460" y2="60"  stroke="#10b981" opacity="0.35"/>
+          <line class="w10" x1="60" y1="220" x2="460" y2="140" stroke="#6366f1" opacity="0.5"/>
+          <line class="w11" x1="60" y1="220" x2="460" y2="220" stroke="#22d3ee" opacity="0.85"/>
+          <line class="w12" x1="60" y1="220" x2="460" y2="300" stroke="#6366f1" opacity="0.4"/>
+          <line class="w13" x1="60" y1="300" x2="460" y2="60"  stroke="#6366f1" opacity="0.3"/>
+          <line class="w14" x1="60" y1="300" x2="460" y2="140" stroke="#10b981" opacity="0.6"/>
+          <line class="w15" x1="60" y1="300" x2="460" y2="220" stroke="#22d3ee" opacity="0.45"/>
+          <line class="w16" x1="60" y1="300" x2="460" y2="300" stroke="#6366f1" opacity="0.8"/>
+        </g>
+        <!-- query tokens -->
+        <circle class="node-dot active" cx="60" cy="60" r="16"/><text class="node-label" x="88" y="68">token₁</text>
+        <circle class="node-dot active" cx="60" cy="140" r="16"/><text class="node-label" x="88" y="148">token₂</text>
+        <circle class="node-dot active" cx="60" cy="220" r="16"/><text class="node-label" x="88" y="228">token₃</text>
+        <circle class="node-dot active" cx="60" cy="300" r="16"/><text class="node-label" x="88" y="308">token₄</text>
+        <!-- key tokens -->
+        <circle class="node-dot" cx="460" cy="60" r="16"/><text class="node-label" x="432" y="68" text-anchor="end"></text>
+        <circle class="node-dot" cx="460" cy="140" r="16"/>
+        <circle class="node-dot" cx="460" cy="220" r="16"/>
+        <circle class="node-dot" cx="460" cy="300" r="16"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ============ BEAT 3 · PARALLEL VS SEQUENTIAL (6.5–10s) ============ -->
+  <section id="scene-parallel" class="clip" data-start="6.5" data-duration="3.5">
+    <div class="glow glow-b"></div>
+    <div class="glow glow-a"></div>
+    <div class="grid-lines"></div>
+
+    <div id="par-kick" class="badge"><span class="dot"></span>Why it scales</div>
+
+    <div class="compare">
+      <div class="panel" id="panel-old">
+        <div class="panel-head"><span class="panel-name">Reading left → right</span><span class="tag slow">Sequential</span></div>
+        <div class="seq-row">
+          <span class="chip" data-seq="0">1</span><span class="chev">→</span>
+          <span class="chip" data-seq="1">2</span><span class="chev">→</span>
+          <span class="chip" data-seq="2">3</span><span class="chev">→</span>
+          <span class="chip" data-seq="3">4</span><span class="chev">→</span>
+          <span class="chip" data-seq="4">5</span>
+        </div>
+        <p class="body-copy" style="margin-top:22px;font-size:22px;">Each step must wait for the one before it.</p>
+      </div>
+
+      <div class="vs" id="vs">VS</div>
+
+      <div class="panel win" id="panel-new">
+        <div class="panel-head"><span class="panel-name">Looking everywhere at once</span><span class="tag fast">Parallel</span></div>
+        <div class="stack">
+          <div class="bar" data-bar="0"></div>
+          <div class="bar" data-bar="1"></div>
+          <div class="bar" data-bar="2"></div>
+        </div>
+        <p class="body-copy" style="margin-top:22px;font-size:22px;color:#a7f3d0;">All relationships computed simultaneously.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BEAT 4 · WHAT IT POWERS (10–13s) ============ -->
+  <section id="scene-power" class="clip" data-start="10" data-duration="3">
+    <div class="glow glow-a"></div>
+    <div class="glow glow-c"></div>
+    <div class="grid-lines"></div>
+
+    <h2 class="headline" id="powHead" style="font-size:70px;">The foundation of <span class="accent-i">modern AI</span></h2>
+
+    <div class="cards">
+      <div class="use-card" id="uc1">
+        <div class="icon-wrap">💬</div>
+        <div class="use-name">Chat assistants</div>
+        <div class="use-desc">Conversation that holds context across thousands of words.</div>
+      </div>
+      <div class="use-card" id="uc2">
+        <div class="icon-wrap">🌐</div>
+        <div class="use-name">Translation</div>
+        <div class="use-desc">Meaning carried between languages, not just words.</div>
+      </div>
+      <div class="use-card" id="uc3">
+        <div class="icon-wrap">🎨</div>
+        <div class="use-name">Image &amp; code</div>
+        <div class="use-desc">Generators and coding assistants built on the same core.</div>
+      </div>
+    </div>
+
+    <p class="foundation-note" id="powNote">Different surfaces — <b>one architecture underneath</b>.</p>
+  </section>
+
+  <!-- ============ BEAT 5 · OUTRO / CTA (13–15s) ============ -->
+  <section id="scene-outro" class="clip" data-start="13" data-duration="2">
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+    <div class="glow glow-c"></div>
+    <div class="grid-lines"></div>
+
+    <div class="paper" id="paper">
+      <div class="paper-over" id="papOver">The breakthrough that started it all</div>
+      <div class="paper-title" id="papTitle">“Attention<br/>Is All You Need”</div>
+      <div class="paper-meta" id="papMeta">Vaswani et al. · NeurIPS 2017</div>
+      <div class="rule" id="papRule"></div>
+    </div>
+
+    <div class="cta" id="ctaRow">
+      <span class="cta-pill">START HERE</span>
+      <span>Read the paper that rewrote machine learning.</span>
+    </div>
+  </section>
+
+  <div class="vignette"></div>
+</div>
+
+<script>
+  const tl = gsap.timeline({ paused: true });
+
+  /* ---------------- BEAT 1 · 0 – 3s ---------------- */
+  tl.fromTo("#hook-badge", { opacity: 0, y: -22, scale: 0.9 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 0.15);
+
+  tl.fromTo(".hook-line", { opacity: 0, y: 46 },
+    { opacity: 1, y: 0, duration: 0.62, ease: "power3.out", stagger: 0.16 }, 0.35);
+
+  tl.fromTo("#tokens .token", { opacity: 0, y: 26, scale: 0.85 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.34, ease: "back.out(1.7)", stagger: 0.055 }, 1.35);
+
+  // pulse the linked tokens ("animal" … "it") to hint at long-range reference
+  tl.to(["#tokens .token.hot"], { boxShadow: "0 0 40px rgba(34,211,238,0.55)", scale: 1.07,
+    duration: 0.32, ease: "power2.out", stagger: 0.12, yoyo: true, repeat: 1 }, 2.0);
+
+  tl.to(["#scene-hook .hook-inner > *", "#scene-hook .glow"],
+    { opacity: 0, y: -34, duration: 0.45, ease: "power2.in" }, 2.55);
+
+  /* ---------------- BEAT 2 · 3 – 6.5s ---------------- */
+  tl.fromTo("#kick2", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, 3.15);
+  tl.fromTo("#year2", { opacity: 0, y: 40, scale: 0.86 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power4.out" }, 3.3);
+  tl.fromTo("#h2b", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 3.6);
+  tl.fromTo("#body2", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 3.9);
+
+  tl.fromTo("#attnCard", { opacity: 0, x: 60, rotate: 1.5 },
+    { opacity: 1, x: 0, rotate: 0, duration: 0.7, ease: "power3.out" }, 3.5);
+
+  // attention edges light up in order — the "aha" of the scene
+  const edges = [".w1",".w2",".w3",".w4",".w5",".w6",".w7",".w8",".w9",".w10",".w11",".w12",".w13",".w14",".w15",".w16"];
+  tl.fromTo(edges, { opacity: 0, scaleX: 0.1, transformOrigin: "0% 50%" },
+    { opacity: "+=1", scaleX: 1, duration: 0.4, ease: "power2.out", stagger: 0.055 }, 4.0);
+
+  // strongest weights breathe
+  tl.to([".w2", ".w6", ".w11", ".w16"], { strokeWidth: 5, opacity: 1, duration: 0.5, ease: "sine.inOut",
+    yoyo: true, repeat: 1, stagger: 0.1 }, 5.1);
+
+  tl.to(["#scene-2017 .left-col > *", "#attnCard"], { opacity: 0, y: -30, duration: 0.45, ease: "power2.in" }, 6.05);
+
+  /* ---------------- BEAT 3 · 6.5 – 10s ---------------- */
+  tl.fromTo("#par-kick", { opacity: 0, y: -20, scale: 0.92 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(1.5)" }, 6.7);
+
+  tl.fromTo("#panel-old", { opacity: 0, x: -70 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, 6.85);
+  tl.fromTo("#vs", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2)" }, 7.15);
+  tl.fromTo("#panel-new", { opacity: 0, x: 70 }, { opacity: 1, x: 0, duration: 0.55, ease: "power3.out" }, 7.0);
+
+  // sequential crawl: chips light one after another, slowly
+  tl.to("#panel-old .chip", { backgroundColor: "rgba(99,102,241,0.28)", borderColor: "rgba(129,140,248,0.7)",
+    color: "#e0e7ff", duration: 0.22, ease: "power1.out", stagger: 0.34 }, 7.5);
+
+  // parallel burst: all bars fire at once
+  tl.fromTo("#panel-new .bar", { scaleX: 0.08, opacity: 0.25, transformOrigin: "0% 50%" },
+    { scaleX: 1, opacity: 1, duration: 0.28, ease: "power4.out", stagger: 0.04 }, 7.7);
+
+  tl.to("#panel-new", { boxShadow: "0 24px 60px rgba(0,0,0,0.5), 0 0 90px rgba(16,185,129,0.3)",
+    duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: 1 }, 8.4);
+
+  tl.to(["#par-kick", "#panel-old", "#panel-new", "#vs"], { opacity: 0, y: -30, duration: 0.45, ease: "power2.in" }, 9.55);
+
+  /* ---------------- BEAT 4 · 10 – 13s ---------------- */
+  tl.fromTo("#powHead", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 10.15);
+
+  tl.fromTo(["#uc1", "#uc2", "#uc3"], { opacity: 0, y: 60, rotateZ: -2 },
+    { opacity: 1, y: 0, rotateZ: 0, duration: 0.55, ease: "back.out(1.3)", stagger: 0.22 }, 10.45);
+
+  tl.to(["#uc1", "#uc2", "#uc3"], { y: -12, duration: 0.7, ease: "sine.inOut", stagger: 0.1, yoyo: true, repeat: 1 }, 11.6);
+
+  tl.fromTo("#powNote", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 11.3);
+
+  tl.to(["#powHead", "#uc1", "#uc2", "#uc3", "#powNote"], { opacity: 0, y: -28, duration: 0.42, ease: "power2.in" }, 12.55);
+
+  /* ---------------- BEAT 5 · 13 – 15s ---------------- */
+  tl.fromTo("#paper", { opacity: 0, y: 70, scale: 0.9 },
+    { opacity: 1, y: 0, scale: 1, duration: 0.6, ease: "power4.out" }, 13.1);
+  tl.fromTo("#papOver", { opacity: 0, letterSpacing: "0.5em" },
+    { opacity: 1, letterSpacing: "0.24em", duration: 0.5, ease: "power2.out" }, 13.35);
+  tl.fromTo("#papTitle", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 13.5);
+  tl.fromTo("#papMeta", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 13.75);
+  tl.fromTo("#papRule", { scaleX: 0, transformOrigin: "50% 50%" }, { scaleX: 1, duration: 0.45, ease: "power3.out" }, 13.85);
+  tl.fromTo("#ctaRow", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.4)" }, 14.0);
+
+  tl.to("#paper", { boxShadow: "0 34px 90px rgba(0,0,0,0.6), 0 0 120px rgba(34,211,238,0.3)",
+    duration: 0.5, ease: "sine.inOut" }, 14.1);
+
+  window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

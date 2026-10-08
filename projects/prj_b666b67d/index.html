@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Attention Is All You Need — Transformers Explained</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #090d16;
+        color: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+        overflow: hidden;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* ---- Backdrops ---- */
+      .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.5;
+        pointer-events: none;
+      }
+      .glow-indigo { background: #6366f1; }
+      .glow-cyan { background: #06b6d4; }
+      .glow-emerald { background: #10b981; }
+
+      /* ---- Typography ---- */
+      .badge {
+        display: inline-block;
+        padding: 10px 22px;
+        border-radius: 9999px;
+        background: rgba(99, 102, 241, 0.14);
+        border: 1px solid rgba(99, 102, 241, 0.45);
+        color: #818cf8;
+        font-size: 21px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        margin-bottom: 30px;
+      }
+      .headline {
+        margin: 0;
+        font-size: 78px;
+        font-weight: 800;
+        text-align: center;
+        line-height: 1.12;
+        letter-spacing: -0.015em;
+        background: linear-gradient(135deg, #ffffff 45%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        max-width: 1500px;
+      }
+      .headline .accent {
+        background: linear-gradient(135deg, #818cf8 0%, #22d3ee 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .subtitle {
+        margin: 26px 0 0 0;
+        font-size: 32px;
+        color: #94a3b8;
+        max-width: 1100px;
+        text-align: center;
+        line-height: 1.5;
+      }
+
+      /* ---- Scene 1: token row ---- */
+      .token-stage {
+        position: relative;
+        width: 1280px;
+        height: 200px;
+        margin-top: 64px;
+      }
+      .token-row {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+      .token {
+        padding: 14px 26px;
+        border-radius: 14px;
+        font-size: 30px;
+        font-weight: 600;
+        color: #cbd5e1;
+        background: rgba(148, 163, 184, 0.08);
+        border: 1px solid rgba(148, 163, 184, 0.22);
+      }
+      .token.hot {
+        color: #e0e7ff;
+        background: rgba(99, 102, 241, 0.18);
+        border-color: rgba(129, 140, 248, 0.65);
+        box-shadow: 0 0 34px rgba(99, 102, 241, 0.35);
+      }
+      .token-arc {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+      }
+      .token-arc path {
+        fill: none;
+        stroke: #22d3ee;
+        stroke-width: 4;
+        stroke-linecap: round;
+        filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.55));
+      }
+
+      /* ---- Scene 3: attention graph ---- */
+      .attn-stage {
+        position: relative;
+        width: 1300px;
+        height: 380px;
+        margin-top: 46px;
+      }
+      .attn-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+      .attn-svg line {
+        stroke: rgba(99, 102, 241, 0.75);
+        stroke-width: 3.5;
+        stroke-linecap: round;
+      }
+      .attn-svg line.strong {
+        stroke: #22d3ee;
+        stroke-width: 5.5;
+        filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.6));
+      }
+      .attn-tokens {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .attn-dot {
+        width: 150px;
+        padding: 16px 0;
+        text-align: center;
+        border-radius: 16px;
+        font-size: 26px;
+        font-weight: 700;
+        color: #94a3b8;
+        background: rgba(148, 163, 184, 0.07);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+      .attn-dot.query {
+        color: #ffffff;
+        background: rgba(34, 211, 238, 0.14);
+        border-color: rgba(34, 211, 238, 0.7);
+        box-shadow: 0 0 44px rgba(34, 211, 238, 0.35);
+        scale: 1.12;
+      }
+      .attn-dot.key {
+        color: #e0e7ff;
+        background: rgba(99, 102, 241, 0.2);
+        border-color: rgba(129, 140, 248, 0.7);
+        box-shadow: 0 0 34px rgba(99, 102, 241, 0.35);
+      }
+      .weight-tag {
+        position: absolute;
+        font-size: 20px;
+        font-weight: 700;
+        color: #22d3ee;
+        letter-spacing: 0.05em;
+      }
+
+      /* ---- Scene 4: cards ---- */
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 28px;
+        margin-top: 58px;
+        width: 1560px;
+      }
+      .card {
+        padding: 40px 28px;
+        border-radius: 22px;
+        background: rgba(148, 163, 184, 0.05);
+        border: 1px solid rgba(148, 163, 184, 0.16);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        text-align: center;
+        backdrop-filter: blur(6px);
+      }
+      .card .icon {
+        font-size: 54px;
+        line-height: 1;
+        margin-bottom: 22px;
+      }
+      .card .name {
+        font-size: 28px;
+        font-weight: 700;
+        color: #f1f5f9;
+        margin-bottom: 10px;
+      }
+      .card .desc {
+        font-size: 20px;
+        color: #94a3b8;
+        line-height: 1.4;
+      }
+
+      /* ---- Scene 5: paper ---- */
+      .paper {
+        width: 1060px;
+        padding: 64px 70px;
+        border-radius: 24px;
+        background: rgba(15, 20, 34, 0.85);
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 90px rgba(99, 102, 241, 0.18);
+        text-align: center;
+        backdrop-filter: blur(8px);
+      }
+      .paper .meta {
+        font-size: 21px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: #64748b;
+        margin-bottom: 28px;
+      }
+      .paper .title {
+        font-size: 64px;
+        font-weight: 800;
+        line-height: 1.15;
+        margin: 0 0 26px 0;
+        background: linear-gradient(135deg, #ffffff 40%, #a5b4fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      .paper .authors {
+        font-size: 24px;
+        color: #94a3b8;
+      }
+      .paper .divider {
+        width: 120px;
+        height: 3px;
+        border-radius: 9999px;
+        margin: 30px auto 0 auto;
+        background: linear-gradient(90deg, #6366f1, #22d3ee);
+      }
+      .outro-line {
+        margin-top: 44px;
+        font-size: 30px;
+        color: #cbd5e1;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-j7pz" id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="30">
+
+      <!-- ============ SCENE 1 · HOOK (0 – 5.5s) ============ -->
+      <section data-hf-id="hf-h7s0" id="scene-1" class="clip" data-start="0" data-duration="5.5">
+        <div data-hf-id="hf-6zvd" class="glow glow-indigo" style="width: 700px; height: 700px; top: -300px; left: -200px; opacity: 0.28;"></div>
+        <div data-hf-id="hf-z4hv" class="glow glow-cyan" style="width: 600px; height: 600px; bottom: -280px; right: -180px; opacity: 0.2;"></div>
+        <div data-hf-id="hf-569g" id="s1-badge" class="badge">The Question</div>
+        <h1 data-hf-id="hf-alrl" id="s1-title" class="headline">
+          What if a machine could understand<br data-hf-id="hf-x5px">
+          <span data-hf-id="hf-8ad6" class="accent">every word</span> — no matter how far apart?
+        </h1>
+        <div data-hf-id="hf-blaa" class="token-stage">
+          <svg data-hf-id="hf-gaqb" class="token-arc" viewBox="0 0 1280 200" preserveAspectRatio="none">
+            <path data-hf-id="hf-bqa2" id="s1-arc" d="M 150 150 C 350 -40, 930 -40, 1130 150" />
+          </svg>
+          <div data-hf-id="hf-2i64" class="token-row">
+            <div data-hf-id="hf-zqpq" id="s1-t1" class="token">The</div>
+            <div data-hf-id="hf-tmnh" id="s1-t2" class="token hot">cat</div>
+            <div data-hf-id="hf-3f1r" id="s1-t3" class="token">chased</div>
+            <div data-hf-id="hf-mjpx" id="s1-t4" class="token">the</div>
+            <div data-hf-id="hf-kuk7" id="s1-t5" class="token hot">mouse</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCENE 2 · TRANSFORMERS INTRO (5.5 – 11s) ============ -->
+      <section data-hf-id="hf-vl25" id="scene-2" class="clip" data-start="5.5" data-duration="5.5">
+        <div data-hf-id="hf-iciv" class="glow glow-indigo" style="width: 900px; height: 900px; top: 50%; left: 50%; margin-top: -450px; margin-left: -450px; opacity: 0.3;"></div>
+        <div data-hf-id="hf-u4t7" id="s2-badge" class="badge">2017 · A New Architecture</div>
+        <h1 data-hf-id="hf-b0d0" id="s2-title" class="headline" style="font-size: 130px;">Transformers</h1>
+        <p data-hf-id="hf-ctzy" id="s2-sub" class="subtitle">
+          The architecture that changed artificial intelligence —<br data-hf-id="hf-rsrt">
+          built on a single powerful mechanism: <strong data-hf-id="hf-m1t6" style="color:#818cf8;">attention</strong>.
+        </p>
+      </section>
+
+      <!-- ============ SCENE 3 · ATTENTION (11 – 18s) ============ -->
+      <section data-hf-id="hf-dgxv" id="scene-3" class="clip" data-start="11" data-duration="7">
+        <div data-hf-id="hf-ctib" class="glow glow-cyan" style="width: 760px; height: 760px; top: -320px; right: -220px; opacity: 0.24;"></div>
+        <div data-hf-id="hf-zhx3" class="glow glow-emerald" style="width: 600px; height: 600px; bottom: -280px; left: -200px; opacity: 0.16;"></div>
+        <div data-hf-id="hf-5cmb" id="s3-badge" class="badge">The Mechanism</div>
+        <h1 data-hf-id="hf-jcss" id="s3-title" class="headline">Not left to right — <span data-hf-id="hf-4ftc" class="accent">all at once</span></h1>
+        <div data-hf-id="hf-rn4g" class="attn-stage">
+          <svg data-hf-id="hf-vhd9" class="attn-svg" viewBox="0 0 1300 380" preserveAspectRatio="none">
+            <line data-hf-id="hf-fl6a" id="s3-l1" class="strong" x1="650" y1="70" x2="150" y2="330" />
+            <line data-hf-id="hf-mzdc" id="s3-l2" x1="650" y1="70" x2="400" y2="340" />
+            <line data-hf-id="hf-v2ff" id="s3-l3" class="strong" x1="650" y1="70" x2="650" y2="350" />
+            <line data-hf-id="hf-esgl" id="s3-l4" x1="650" y1="70" x2="900" y2="340" />
+            <line data-hf-id="hf-cbw7" id="s3-l5" class="strong" x1="650" y1="70" x2="1150" y2="330" />
+          </svg>
+          <div data-hf-id="hf-wuz3" class="attn-tokens" style="align-items: flex-start;">
+            <div data-hf-id="hf-frc0" id="s3-q" class="attn-dot query">it</div>
+          </div>
+          <div data-hf-id="hf-jtou" class="attn-tokens" style="align-items: flex-end;">
+            <div data-hf-id="hf-o4d6" id="s3-k1" class="attn-dot key">The</div>
+            <div data-hf-id="hf-osrn" id="s3-k2" class="attn-dot">animal</div>
+            <div data-hf-id="hf-oc7m" id="s3-k3" class="attn-dot key">crossed</div>
+            <div data-hf-id="hf-qfv4" id="s3-k4" class="attn-dot">the</div>
+            <div data-hf-id="hf-kkzg" id="s3-k5" class="attn-dot key">street</div>
+          </div>
+          <div data-hf-id="hf-tem2" id="s3-w1" class="weight-tag" style="left: 250px; top: 190px;">0.12</div>
+          <div data-hf-id="hf-6hgq" id="s3-w3" class="weight-tag" style="left: 610px; top: 220px;">0.41</div>
+          <div data-hf-id="hf-2kpu" id="s3-w5" class="weight-tag" style="left: 970px; top: 190px;">0.35</div>
+        </div>
+        <p data-hf-id="hf-tjxd" id="s3-sub" class="subtitle">Attention scores decide <strong data-hf-id="hf-ags1" style="color:#22d3ee;">which words matter most</strong> — in parallel, across the whole sequence.</p>
+      </section>
+
+      <!-- ============ SCENE 4 · FOUNDATION (18 – 25s) ============ -->
+      <section data-hf-id="hf-h0gr" id="scene-4" class="clip" data-start="18" data-duration="7">
+        <div data-hf-id="hf-d2ga" class="glow glow-indigo" style="width: 800px; height: 800px; top: -340px; left: 50%; margin-left: -400px; opacity: 0.26;"></div>
+        <div data-hf-id="hf-wgem" id="s4-badge" class="badge">One Idea · Every System</div>
+        <h1 data-hf-id="hf-9bg1" id="s4-title" class="headline">The foundation of <span data-hf-id="hf-jco6" class="accent">modern AI</span></h1>
+        <div data-hf-id="hf-g3sv" class="card-grid">
+          <div data-hf-id="hf-a1m5" id="s4-card1" class="card">
+            <div data-hf-id="hf-40k2" class="icon">💬</div>
+            <div data-hf-id="hf-gwtw" class="name">ChatGPT</div>
+            <div data-hf-id="hf-1fnk" class="desc">Conversational intelligence</div>
+          </div>
+          <div data-hf-id="hf-dzq6" id="s4-card2" class="card">
+            <div data-hf-id="hf-ra5s" class="icon">🌍</div>
+            <div data-hf-id="hf-gjwg" class="name">Translation</div>
+            <div data-hf-id="hf-jmj5" class="desc">Across 100+ languages</div>
+          </div>
+          <div data-hf-id="hf-hxu7" id="s4-card3" class="card">
+            <div data-hf-id="hf-tnn3" class="icon">🎨</div>
+            <div data-hf-id="hf-zen4" class="name">Image Gen</div>
+            <div data-hf-id="hf-hlc3" class="desc">Text-to-image creation</div>
+          </div>
+          <div data-hf-id="hf-lvy8" id="s4-card4" class="card">
+            <div data-hf-id="hf-4mx6" class="icon">⌨️</div>
+            <div data-hf-id="hf-1m0o" class="name">Coding Assistants</div>
+            <div data-hf-id="hf-vw6t" class="desc">Pair programming at scale</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ SCENE 5 · THE PAPER (25 – 30s) ============ -->
+      <section data-hf-id="hf-pxdo" id="scene-5" class="clip" data-start="25" data-duration="5">
+        <div data-hf-id="hf-hx8n" class="glow glow-indigo" style="width: 900px; height: 900px; top: 50%; left: 50%; margin-top: -450px; margin-left: -450px; opacity: 0.3;"></div>
+        <div data-hf-id="hf-btd1" class="glow glow-cyan" style="width: 500px; height: 500px; bottom: -240px; right: -160px; opacity: 0.22;"></div>
+        <div data-hf-id="hf-0i5l" id="s5-paper" class="paper">
+          <div data-hf-id="hf-qtbj" id="s5-meta" class="meta">NeurIPS 2017 · Vaswani et al.</div>
+          <h2 data-hf-id="hf-dke9" id="s5-title" class="title">“Attention Is All You Need”</h2>
+          <div data-hf-id="hf-gztg" id="s5-authors" class="authors">The breakthrough that changed AI forever.</div>
+          <div data-hf-id="hf-sywd" id="s5-divider" class="divider"></div>
+        </div>
+        <div data-hf-id="hf-o9p8" id="s5-outro" class="outro-line">How did one architecture become this powerful?</div>
+      </section>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      /* ================= SCENE 1 (0 – 5.5s) ================= */
+      tl.fromTo("#s1-badge",
+        { opacity: 0, y: -24, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.6)" }, 0.15);
+      tl.fromTo("#s1-title",
+        { opacity: 0, y: 46 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power4.out" }, 0.35);
+
+      // Tokens cascade in
+      tl.fromTo(["#s1-t1", "#s1-t2", "#s1-t3", "#s1-t4", "#s1-t5"],
+        { opacity: 0, y: 34 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.09, ease: "back.out(1.4)" }, 0.9);
+
+      // "cat" and "mouse" heat up — relationship discovered
+      tl.fromTo(["#s1-t2", "#s1-t5"],
+        { backgroundColor: "rgba(148,163,184,0.08)", borderColor: "rgba(148,163,184,0.22)", color: "#cbd5e1" },
+        { backgroundColor: "rgba(99,102,241,0.18)", borderColor: "rgba(129,140,248,0.65)", color: "#e0e7ff", duration: 0.55, ease: "power2.out" }, 1.9);
+
+      // Attention arc draws between distant words
+      tl.fromTo("#s1-arc",
+        { strokeDasharray: 1300, strokeDashoffset: 1300, opacity: 0 },
+        { strokeDashoffset: 0, opacity: 1, duration: 0.9, ease: "power2.inOut" }, 2.0);
+      tl.fromTo("#s1-arc",
+        { scale: 0.94 },
+        { scale: 1, duration: 0.9, ease: "power1.out", transformOrigin: "50% 100%" }, 2.0);
+
+      // Scene 1 exit
+      tl.to("#s1-arc", { opacity: 0, duration: 0.4, ease: "power2.in" }, 4.9);
+      tl.to(["#s1-badge", "#s1-title", "#s1-t1", "#s1-t2", "#s1-t3", "#s1-t4", "#s1-t5"],
+        { opacity: 0, y: -34, duration: 0.5, ease: "power2.in" }, 5.0);
+
+      /* ================= SCENE 2 (5.5 – 11s) ================= */
+      tl.fromTo("#s2-badge",
+        { opacity: 0, y: -22, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.6)" }, 5.75);
+      tl.fromTo("#s2-title",
+        { opacity: 0, y: 70, scale: 0.92 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.9, ease: "power4.out" }, 5.95);
+      tl.fromTo("#s2-sub",
+        { opacity: 0, y: 32 },
+        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 6.45);
+
+      // Gentle living pulse on the title
+      tl.to("#s2-title", { scale: 1.03, duration: 1.4, ease: "sine.inOut", transformOrigin: "50% 50%" }, 7.4);
+      tl.to("#s2-title", { scale: 1, duration: 1.4, ease: "sine.inOut" }, 8.8);
+
+      // Scene 2 exit
+      tl.to(["#s2-badge", "#s2-title", "#s2-sub"],
+        { opacity: 0, y: -34, duration: 0.5, ease: "power2.in" }, 10.4);
+
+      /* ================= SCENE 3 (11 – 18s) ================= */
+      tl.fromTo("#s3-badge",
+        { opacity: 0, y: -22, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.6)" }, 11.25);
+      tl.fromTo("#s3-title",
+        { opacity: 0, y: 42 },
+        { opacity: 1, y: 0, duration: 0.75, ease: "power4.out" }, 11.45);
+      tl.fromTo("#s3-sub",
+        { opacity: 0, y: 26 },
+        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 11.85);
+
+      // Query token pops
+      tl.fromTo("#s3-q",
+        { opacity: 0, scale: 0.6 },
+        { opacity: 1, scale: 1.12, duration: 0.6, ease: "back.out(1.8)" }, 12.15);
+
+      // Key tokens appear
+      tl.fromTo(["#s3-k1", "#s3-k2", "#s3-k3", "#s3-k4", "#s3-k5"],
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: "back.out(1.4)" }, 12.35);
+
+      // Attention lines draw out from the query (all at once — in parallel)
+      tl.fromTo(["#s3-l1", "#s3-l2", "#s3-l3", "#s3-l4", "#s3-l5"],
+        { strokeDasharray: 420, strokeDashoffset: 420, opacity: 0 },
+        { strokeDashoffset: 0, opacity: 1, duration: 0.55, ease: "power2.out" }, 13.05);
+
+      // Weights reveal — strong connections glow, weak ones fade
+      tl.fromTo(["#s3-w1", "#s3-w3", "#s3-w5"],
+        { opacity: 0, scale: 0.7 },
+        { opacity: 1, scale: 1, duration: 0.45, stagger: 0.14, ease: "back.out(2)" }, 13.7);
+      tl.to(["#s3-l2", "#s3-l4"], { opacity: 0.28, duration: 0.6, ease: "power2.out" }, 14.2);
+      tl.to(["#s3-k2", "#s3-k4"], { opacity: 0.45, duration: 0.6, ease: "power2.out" }, 14.2);
+      tl.to(["#s3-k1", "#s3-k3", "#s3-k5"],
+        { backgroundColor: "rgba(99,102,241,0.2)", borderColor: "rgba(129,140,248,0.7)", color: "#e0e7ff", duration: 0.6, ease: "power2.out" }, 14.2);
+
+      // Living shimmer on strong lines
+      tl.to(["#s3-l1", "#s3-l3", "#s3-l5"], { strokeWidth: 7, duration: 0.9, ease: "sine.inOut" }, 15.2);
+      tl.to(["#s3-l1", "#s3-l3", "#s3-l5"], { strokeWidth: 5.5, duration: 0.9, ease: "sine.inOut" }, 16.1);
+
+      // Scene 3 exit
+      tl.to(["#s3-l1", "#s3-l2", "#s3-l3", "#s3-l4", "#s3-l5", "#s3-w1", "#s3-w3", "#s3-w5"],
+        { opacity: 0, duration: 0.4, ease: "power2.in" }, 17.4);
+      tl.to(["#s3-badge", "#s3-title", "#s3-sub", "#s3-q", "#s3-k1", "#s3-k2", "#s3-k3", "#s3-k4", "#s3-k5"],
+        { opacity: 0, y: -30, duration: 0.5, ease: "power2.in" }, 17.5);
+
+      /* ================= SCENE 4 (18 – 25s) ================= */
+      tl.fromTo("#s4-badge",
+        { opacity: 0, y: -22, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.6)" }, 18.25);
+      tl.fromTo("#s4-title",
+        { opacity: 0, y: 42 },
+        { opacity: 1, y: 0, duration: 0.75, ease: "power4.out" }, 18.45);
+
+      // Cards punch in with stagger
+      tl.fromTo(["#s4-card1", "#s4-card2", "#s4-card3", "#s4-card4"],
+        { opacity: 0, y: 56, scale: 0.9 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.65, stagger: 0.14, ease: "back.out(1.5)" }, 18.95);
+
+      // Successive highlight sweep across cards
+      tl.to("#s4-card1",
+        { borderColor: "rgba(129,140,248,0.7)", backgroundColor: "rgba(99,102,241,0.14)", duration: 0.45, ease: "power2.out" }, 20.2);
+      tl.to("#s4-card2",
+        { borderColor: "rgba(34,211,238,0.7)", backgroundColor: "rgba(34,211,238,0.1)", duration: 0.45, ease: "power2.out" }, 20.65);
+      tl.to("#s4-card3",
+        { borderColor: "rgba(16,185,129,0.7)", backgroundColor: "rgba(16,185,129,0.1)", duration: 0.45, ease: "power2.out" }, 21.1);
+      tl.to("#s4-card4",
+        { borderColor: "rgba(129,140,248,0.7)", backgroundColor: "rgba(99,102,241,0.14)", duration: 0.45, ease: "power2.out" }, 21.55);
+
+      // Subtle collective breathe
+      tl.to(["#s4-card1", "#s4-card2", "#s4-card3", "#s4-card4"],
+        { y: -10, duration: 1.1, ease: "sine.inOut" }, 22.3);
+      tl.to(["#s4-card1", "#s4-card2", "#s4-card3", "#s4-card4"],
+        { y: 0, duration: 1.1, ease: "sine.inOut" }, 23.4);
+
+      // Scene 4 exit
+      tl.to(["#s4-badge", "#s4-title"],
+        { opacity: 0, y: -30, duration: 0.5, ease: "power2.in" }, 24.3);
+      tl.to(["#s4-card1", "#s4-card2", "#s4-card3", "#s4-card4"],
+        { opacity: 0, y: -36, duration: 0.55, stagger: 0.06, ease: "power2.in" }, 24.4);
+
+      /* ================= SCENE 5 (25 – 30s) ================= */
+      tl.fromTo("#s5-paper",
+        { opacity: 0, y: 60, scale: 0.94 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.85, ease: "power4.out" }, 25.3);
+      tl.fromTo("#s5-meta",
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 25.75);
+      tl.fromTo("#s5-title",
+        { opacity: 0, y: 30, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power4.out" }, 25.95);
+      tl.fromTo("#s5-authors",
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 26.45);
+      tl.fromTo("#s5-divider",
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.7, ease: "power3.inOut", transformOrigin: "50% 50%" }, 26.7);
+      tl.fromTo("#s5-outro",
+        { opacity: 0, y: 26 },
+        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 27.2);
+
+      // Final settle — everything breathes out and fades
+      tl.to("#s5-paper",
+        { scale: 1.02, duration: 1.4, ease: "sine.inOut", transformOrigin: "50% 50%" }, 28.0);
+      tl.to(["#s5-paper", "#s5-outro"],
+        { opacity: 0, y: -26, duration: 0.6, ease: "power2.in" }, 29.3);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
