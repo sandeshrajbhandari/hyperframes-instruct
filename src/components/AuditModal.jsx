@@ -14,7 +14,6 @@ import {
   FileCode,
   LayoutGrid,
   Sun,
-  Cpu,
   RefreshCw,
   Terminal,
   Copy,
@@ -22,15 +21,10 @@ import {
 } from 'lucide-react';
 
 export default function AuditModal({ project, isOpen, onClose }) {
-  const [activeTab, setActiveTab] = useState('all'); // 'all', 'lint', 'layout', 'contrast', 'dom'
+  const [activeTab, setActiveTab] = useState('all'); // 'all', 'lint', 'layout', 'contrast'
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-
-  // In-browser DOM geometry scan state
-  const [domScanLoading, setDomScanLoading] = useState(false);
-  const [domCollisions, setDomCollisions] = useState([]);
-  const [domFramesChecked, setDomFramesChecked] = useState(0);
 
   // Markdown copy states
   const [copiedMd, setCopiedMd] = useState(false);
@@ -57,146 +51,9 @@ export default function AuditModal({ project, isOpen, onClose }) {
     }
   };
 
-  // Run pure programmatic in-browser DOM collision sweep
-  const runDomScan = () => {
-    setDomScanLoading(true);
-    setDomCollisions([]);
-
-    const iframe = document.createElement('iframe');
-    iframe.src = `/preview/${project.id}`;
-    iframe.style.position = 'fixed';
-    iframe.style.top = '-9999px';
-    iframe.style.left = '-9999px';
-    iframe.style.width = '1920px';
-    iframe.style.height = '1080px';
-    iframe.style.opacity = '0';
-    iframe.style.pointerEvents = 'none';
-
-    document.body.appendChild(iframe);
-
-    iframe.onload = () => {
-      setTimeout(() => {
-        try {
-          const win = iframe.contentWindow;
-          const doc = iframe.contentDocument;
-          const tl = win?.__timelines ? Object.values(win.__timelines)[0] : null;
-
-          if (!tl) {
-            setDomScanLoading(false);
-            document.body.removeChild(iframe);
-            return;
-          }
-
-          const duration = tl.duration() || project.duration || 10;
-          const step = 0.25;
-          const findings = [];
-          let count = 0;
-
-          tl.pause();
-
-          for (let t = 0; t <= duration; t += step) {
-            count++;
-            tl.seek(t, true);
-
-            const candidates = Array.from(doc.querySelectorAll('#root *')).filter((el) => {
-              const style = win.getComputedStyle(el);
-              if (
-                style.display === 'none' ||
-                style.visibility === 'hidden' ||
-                parseFloat(style.opacity) < 0.1
-              ) {
-                return false;
-              }
-
-              if (
-                el.id === 'root' ||
-                el.classList.contains('clip') ||
-                el.classList.contains('glow') ||
-                el.classList.contains('grid-lines') ||
-                el.classList.contains('vignette')
-              ) {
-                return false;
-              }
-
-              const hasDirectText = Array.from(el.childNodes).some(
-                (n) => n.nodeType === 3 && n.textContent.trim().length > 0
-              );
-              const isUIBlock =
-                el.classList.contains('badge') ||
-                el.classList.contains('token') ||
-                el.classList.contains('card') ||
-                el.classList.contains('use-card') ||
-                el.tagName.startsWith('H') ||
-                el.tagName === 'P';
-
-              return hasDirectText || isUIBlock;
-            });
-
-            for (let i = 0; i < candidates.length; i++) {
-              for (let j = i + 1; j < candidates.length; j++) {
-                const elA = candidates[i];
-                const elB = candidates[j];
-
-                if (elA.contains(elB) || elB.contains(elA)) continue;
-
-                const rA = elA.getBoundingClientRect();
-                const rB = elB.getBoundingClientRect();
-
-                if (rA.width < 10 || rA.height < 10 || rB.width < 10 || rB.height < 10) continue;
-
-                const xOverlap = Math.max(0, Math.min(rA.right, rB.right) - Math.max(rA.left, rB.left));
-                const yOverlap = Math.max(0, Math.min(rA.bottom, rB.bottom) - Math.max(rA.top, rB.top));
-
-                if (xOverlap > 6 && yOverlap > 6) {
-                  const area = xOverlap * yOverlap;
-                  const minArea = Math.min(rA.width * rA.height, rB.width * rB.height);
-                  const overlapPct = Math.round((area / minArea) * 100);
-
-                  if (overlapPct > 10) {
-                    const selA = elA.id ? `#${elA.id}` : elA.className ? `.${elA.className.split(' ')[0]}` : elA.tagName.toLowerCase();
-                    const selB = elB.id ? `#${elB.id}` : elB.className ? `.${elB.className.split(' ')[0]}` : elB.tagName.toLowerCase();
-
-                    const isDupe = findings.some(
-                      (f) =>
-                        Math.abs(f.time - t) < 0.35 &&
-                        ((f.selectorA === selA && f.selectorB === selB) ||
-                          (f.selectorA === selB && f.selectorB === selA))
-                    );
-
-                    if (!isDupe) {
-                      findings.push({
-                        time: Number(t.toFixed(2)),
-                        selectorA: selA,
-                        textA: elA.innerText?.trim()?.slice(0, 36) || '',
-                        selectorB: selB,
-                        textB: elB.innerText?.trim()?.slice(0, 36) || '',
-                        xOverlap: Math.round(xOverlap),
-                        yOverlap: Math.round(yOverlap),
-                        overlapPct,
-                      });
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-          setDomFramesChecked(count);
-          setDomCollisions(findings);
-        } catch (e) {
-          console.error(e);
-        } finally {
-          setDomScanLoading(false);
-          document.body.removeChild(iframe);
-        }
-      }, 350);
-    };
-  };
-
   useEffect(() => {
     if (isOpen && project) {
       runCliAudit();
-      runDomScan();
     }
   }, [isOpen, project?.id]);
 
@@ -268,24 +125,9 @@ export default function AuditModal({ project, isOpen, onClose }) {
       md += `## 1. Linter Findings\n- ✅ Passed cleanly with 0 syntax or code contract errors.\n\n`;
     }
 
-    // 2. DOM Overlaps Section
-    if (domCollisions.length > 0) {
-      md += `## 2. Programmatic DOM Overlaps (${domCollisions.length})\n\n`;
-      domCollisions.forEach((c, i) => {
-        md += `### ${i + 1}. Collision: \`${c.selectorA}\` overlaps with \`${c.selectorB}\`\n`;
-        md += `- **Time:** \`${c.time}s\`\n`;
-        if (c.textA) md += `- **Element A Text:** "${c.textA}"\n`;
-        if (c.textB) md += `- **Element B Text:** "${c.textB}"\n`;
-        md += `- **Collision Dimensions:** ${c.xOverlap}px width × ${c.yOverlap}px height (${c.overlapPct}% overlap)\n`;
-        md += `- **Prescribed Fix:** Give \`${c.selectorA}\` and \`${c.selectorB}\` separate layout zones (flex gap / margins) or distinct entrance timestamps in the GSAP timeline. If layering is intentional, add \`data-layout-allow-overlap\`.\n\n`;
-      });
-    } else {
-      md += `## 2. Programmatic DOM Overlaps\n- ✅ 0 bounding box collisions detected across ${domFramesChecked} frame samples.\n\n`;
-    }
-
-    // 3. CLI Layout Section
+    // 2. CLI Layout Section
     if (layoutFindings.length > 0 && !wasBrowserSkipped) {
-      md += `## 3. CLI Layout Engine Findings (${layoutFindings.length})\n\n`;
+      md += `## 2. CLI Layout Engine Findings (${layoutFindings.length})\n\n`;
       layoutFindings.forEach((f, i) => {
         md += `### ${i + 1}. [${(f.severity || 'issue').toUpperCase()}] \`${f.code}\`${f.selector ? ` on \`${f.selector}\`` : ''}\n`;
         if (f.time !== undefined) md += `- **Time:** ${f.time}s\n`;
@@ -294,14 +136,14 @@ export default function AuditModal({ project, isOpen, onClose }) {
         md += `\n`;
       });
     } else if (wasBrowserSkipped) {
-      md += `## 3. CLI Layout Engine\n- ⚠️ Browser layout sweep was paused because the linter error above must be resolved first.\n\n`;
+      md += `## 2. CLI Layout Engine\n- ⚠️ Browser layout sweep was paused because the linter error above must be resolved first.\n\n`;
     } else {
-      md += `## 3. CLI Layout Engine\n- ✅ Passed with 0 content overlaps and 0 canvas overflows.\n\n`;
+      md += `## 2. CLI Layout Engine\n- ✅ Passed with 0 content overlaps and 0 canvas overflows.\n\n`;
     }
 
-    // 4. Contrast Section
+    // 3. Contrast Section
     if (contrastFindings.length > 0) {
-      md += `## 4. Contrast & Legibility Fixes (${contrastFindings.length})\n\n`;
+      md += `## 3. Contrast & Legibility Fixes (${contrastFindings.length})\n\n`;
       contrastFindings.forEach((c, i) => {
         md += `### ${i + 1}. Contrast Failure on \`${c.selector}\`\n`;
         if (c.text) md += `- **Target Text:** "${c.text}"\n`;
@@ -389,15 +231,12 @@ export default function AuditModal({ project, isOpen, onClose }) {
             </button>
 
             <button
-              onClick={() => {
-                runCliAudit();
-                runDomScan();
-              }}
-              disabled={loading || domScanLoading}
+              onClick={runCliAudit}
+              disabled={loading}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-50 transition-all cursor-pointer shadow-sm"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-              <span>Re-run Full Audit</span>
+              <span>Re-run Audit</span>
             </button>
 
             <button
@@ -410,7 +249,7 @@ export default function AuditModal({ project, isOpen, onClose }) {
         </div>
 
         {/* Overview Metric Cards */}
-        <div className="px-6 py-3.5 bg-slate-950/70 border-b border-slate-800/80 grid grid-cols-4 gap-3 text-xs">
+        <div className="px-6 py-3.5 bg-slate-950/70 border-b border-slate-800/80 grid grid-cols-3 gap-3 text-xs">
           {/* Linter Card */}
           <div
             onClick={() => setActiveTab('lint')}
@@ -500,34 +339,6 @@ export default function AuditModal({ project, isOpen, onClose }) {
             </div>
             <div className="text-[11px] text-slate-400">WCAG AA compliance</div>
           </div>
-
-          {/* Programmatic DOM Geometry Card */}
-          <div
-            onClick={() => setActiveTab('dom')}
-            className={`p-3 rounded-xl border transition-all cursor-pointer ${
-              domCollisions.length > 0
-                ? 'bg-red-950/20 border-red-800/60 text-red-200'
-                : 'bg-emerald-950/20 border-emerald-800/60 text-emerald-200'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-                <Cpu className="w-3.5 h-3.5 text-indigo-400" />
-                DOM Geometry Scan
-              </span>
-              {domCollisions.length === 0 ? (
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              ) : (
-                <AlertCircle className="w-3.5 h-3.5 text-red-400" />
-              )}
-            </div>
-            <div className="text-lg font-bold mt-1 text-white">
-              {domCollisions.length === 0 ? 'Passed' : `${domCollisions.length} Collisions`}
-            </div>
-            <div className="text-[11px] text-slate-400">
-              Swept {domFramesChecked} frames (0.25s)
-            </div>
-          </div>
         </div>
 
         {/* Tab Selection Filter */}
@@ -540,7 +351,7 @@ export default function AuditModal({ project, isOpen, onClose }) {
                 : 'text-slate-400 hover:text-white hover:bg-slate-800'
             }`}
           >
-            All Findings ({lintFindings.length + layoutFindings.length + contrastFindings.length + domCollisions.length})
+            All Findings ({lintFindings.length + layoutFindings.length + contrastFindings.length})
           </button>
 
           <button
@@ -552,17 +363,6 @@ export default function AuditModal({ project, isOpen, onClose }) {
             }`}
           >
             Linter Errors & Warnings ({lintFindings.length})
-          </button>
-
-          <button
-            onClick={() => setActiveTab('dom')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-colors ${
-              activeTab === 'dom'
-                ? 'bg-indigo-600 text-white'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-            }`}
-          >
-            DOM Overlaps ({domCollisions.length})
           </button>
 
           <button
@@ -611,7 +411,7 @@ export default function AuditModal({ project, isOpen, onClose }) {
                       Linter Error Paused the CLI Browser Check
                     </div>
                     <p className="text-slate-300 mt-1 leading-relaxed">
-                      HyperFrames CLI enforces a strict quality gate: <strong>if any linter error exists, it skips the headless Chromium layout audit</strong> to avoid rendering invalid animation syntax. Fix the linter error below to re-enable full CLI layout checks, or use the <strong>DOM Overlaps</strong> tab to inspect collisions immediately.
+                      HyperFrames CLI enforces a strict quality gate: <strong>if any linter error exists, it skips the headless Chromium layout audit</strong> to avoid rendering invalid animation syntax. Fix the linter error below to re-enable full CLI layout checks.
                     </p>
                   </div>
                 </div>
@@ -698,111 +498,7 @@ export default function AuditModal({ project, isOpen, onClose }) {
                 </div>
               )}
 
-              {/* 2. PROGRAMMATIC DOM GEOMETRY OVERLAPS */}
-              {(activeTab === 'all' || activeTab === 'dom') && (
-                <div className="flex flex-col gap-3">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center justify-between">
-                    <span className="flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-cyan-400" />
-                      Programmatic DOM Overlaps ({domCollisions.length})
-                    </span>
-                    <span className="text-[11px] text-slate-500 font-normal">
-                      2D AABB intersection (frame-by-frame)
-                    </span>
-                  </h3>
-
-                  {domCollisions.length > 0 ? (
-                    <div className="flex flex-col gap-3">
-                      {domCollisions.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="rounded-xl border border-red-900/60 bg-slate-950 p-4 flex flex-col gap-2.5 text-xs"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
-                              VISUAL OVERLAP DETECTED
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <span className="flex items-center gap-1 text-slate-400 font-mono text-[11px]">
-                                <Clock className="w-3 h-3 text-slate-500" />
-                                At timestamp: <b>{item.time}s</b>
-                              </span>
-                              <button
-                                onClick={() =>
-                                  handleCopyItem(
-                                    `dom-${idx}`,
-                                    `### Visual Overlap Collision: \`${item.selectorA}\` overlaps with \`${item.selectorB}\`\n- **Time:** \`${item.time}s\`\n${item.textA ? `- **Element A Text:** "${item.textA}"\n` : ''}${item.textB ? `- **Element B Text:** "${item.textB}"\n` : ''}- **Collision Area:** ${item.xOverlap}px wide × ${item.yOverlap}px tall (${item.overlapPct}% overlap)\n- **Prescribed Fix:** Give \`${item.selectorA}\` and \`${item.selectorB}\` separate layout zones (flex gap / margins) or distinct entrance timestamps in the GSAP timeline. If layering is intentional, add \`data-layout-allow-overlap\`.`
-                                  )
-                                }
-                                className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-slate-200 transition-colors"
-                                title="Copy overlap details and fix as markdown"
-                              >
-                                {copiedItemId === `dom-${idx}` ? (
-                                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                ) : (
-                                  <Copy className="w-3.5 h-3.5" />
-                                )}
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="p-3 bg-slate-900/90 rounded-lg border border-slate-800 font-mono text-[11px] text-slate-300 flex flex-col gap-1.5">
-                            <div className="flex items-center gap-2">
-                              <span className="text-slate-500">Element A:</span>
-                              <span className="text-amber-400 font-semibold">{item.selectorA}</span>
-                              {item.textA && (
-                                <span className="text-slate-400 font-normal truncate">
-                                  ("{item.textA}")
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-slate-500">Element B:</span>
-                              <span className="text-red-400 font-semibold">{item.selectorB}</span>
-                              {item.textB && (
-                                <span className="text-slate-400 font-normal truncate">
-                                  ("{item.textB}")
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-slate-400 pt-1.5 border-t border-slate-800/80 mt-1 flex items-center gap-4 text-[10px]">
-                              <span>
-                                Collision Area: <b>{item.xOverlap}px</b> wide × <b>{item.yOverlap}px</b> tall
-                              </span>
-                              <span>
-                                Overlap Ratio: <b>{item.overlapPct}%</b>
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Prescribed Fix Box */}
-                          <div className="p-3 rounded-lg bg-indigo-950/40 border border-indigo-900/50 flex items-start gap-2.5 text-indigo-200">
-                            <Wand2 className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                            <div className="flex-1">
-                              <span className="font-bold text-indigo-300">Recommended Fix:</span>{' '}
-                              <span className="text-[11px] text-indigo-100">
-                                Give {item.selectorA} and {item.selectorB} distinct layout zones with CSS margins/flex gap, separate their animation timestamps, or add <code>data-layout-allow-overlap</code> if layering is intentional.
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-5 bg-slate-950/60 border border-slate-800 rounded-xl flex items-center gap-3 text-xs text-slate-300">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
-                      <div>
-                        <div className="font-semibold text-white">0 DOM Bounding-Box Overlaps</div>
-                        <div className="text-slate-400 text-[11px]">
-                          All elements checked across {domFramesChecked} timeline frames have clean, non-intersecting coordinates.
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* 3. CLI LAYOUT FINDINGS */}
+              {/* 2. CLI LAYOUT FINDINGS */}
               {(activeTab === 'all' || activeTab === 'layout') && !wasBrowserSkipped && (
                 <div className="flex flex-col gap-3">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
@@ -869,7 +565,7 @@ export default function AuditModal({ project, isOpen, onClose }) {
                 </div>
               )}
 
-              {/* 4. CONTRAST FINDINGS WITH PRESCRIBED COLORS */}
+              {/* 3. CONTRAST FINDINGS WITH PRESCRIBED COLORS */}
               {(activeTab === 'all' || activeTab === 'contrast') && contrastFindings.length > 0 && (
                 <div className="flex flex-col gap-3">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
