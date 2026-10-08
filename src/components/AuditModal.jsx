@@ -32,6 +32,10 @@ export default function AuditModal({ project, isOpen, onClose }) {
   const [domCollisions, setDomCollisions] = useState([]);
   const [domFramesChecked, setDomFramesChecked] = useState(0);
 
+  // Markdown copy states
+  const [copiedMd, setCopiedMd] = useState(false);
+  const [copiedItemId, setCopiedItemId] = useState(null);
+
   // Run the full HyperFrames CLI audit (lint + runtime + layout + contrast + snapshots)
   const runCliAudit = async () => {
     setLoading(true);
@@ -225,8 +229,11 @@ export default function AuditModal({ project, isOpen, onClose }) {
     otherLayoutIssues.length +
     (result?.contrast?.warningCount || 0);
 
-  const [copiedMd, setCopiedMd] = useState(false);
-  const [copiedItemId, setCopiedItemId] = useState(null);
+  const allPassed =
+    result &&
+    totalErrors === 0 &&
+    totalWarnings === 0 &&
+    domCollisions.length === 0;
 
   const handleCopyItem = (id, text) => {
     navigator.clipboard.writeText(text);

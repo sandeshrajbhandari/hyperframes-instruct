@@ -155,6 +155,7 @@ export const STARTER_TEMPLATE = `<!doctype html>
       // Subtle pulse and exit
       tl.to(["#badge", "#title", "#sub", "#card"], { opacity: 0, y: -30, duration: 0.6, ease: "power2.in" }, 5.2);
 
+      window.__timelines = window.__timelines || {};
       window.__timelines["main"] = tl;
     </script>
   </body>
@@ -611,12 +612,23 @@ app.get('/preview/:id', (req, res) => {
   `;
 
   let modifiedHtml = project.html;
-  // Inject base href so relative asset paths like "assets/..." resolve correctly in browser preview
-  const baseTag = `<base href="/preview/${project.id}/">`;
+  // Inject runtime bootstrap and base href into <head> so window.__timelines exists before any inline script runs
+  const headBootstrap = `
+    <base href="/preview/${project.id}/">
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__hyperframes = window.__hyperframes || {
+        getVariables: function() { return {}; },
+        fitTextFontSize: function(text, opts) {
+          return { fontSize: (opts && opts.baseFontSize) || 72 };
+        }
+      };
+    </script>
+  `;
   if (modifiedHtml.includes('<head>')) {
-    modifiedHtml = modifiedHtml.replace('<head>', `<head>\n    ${baseTag}`);
+    modifiedHtml = modifiedHtml.replace('<head>', `<head>\n${headBootstrap}`);
   } else {
-    modifiedHtml = `${baseTag}\n${modifiedHtml}`;
+    modifiedHtml = `${headBootstrap}\n${modifiedHtml}`;
   }
 
   if (modifiedHtml.includes('</body>')) {
