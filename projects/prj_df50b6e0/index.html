@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Transformers — Attention Is All You Need</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { background: #070b14; }
+      body {
+        margin: 0;
+        background: #070b14;
+        color: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; }
+      .clip { position: absolute; inset: 0; }
+      .scene { display: flex; align-items: center; justify-content: center; }
+      .inner { display: flex; flex-direction: column; align-items: center; }
+      .hide { opacity: 0; }
+
+      /* ---------- Persistent background ---------- */
+      #bgBase {
+        position: absolute; inset: 0;
+        background:
+          radial-gradient(1300px 900px at 18% 8%, rgba(99,102,241,0.13), transparent 60%),
+          radial-gradient(1200px 800px at 84% 92%, rgba(6,182,212,0.10), transparent 62%),
+          #070b14;
+      }
+      #bgGrid { position: absolute; left: 0; top: 0; width: calc(100% + 64px); height: calc(100% + 64px); }
+      #bgGrid .grid {
+        width: 100%; height: 100%;
+        background-image:
+          linear-gradient(rgba(148,163,184,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(148,163,184,0.05) 1px, transparent 1px);
+        background-size: 64px 64px;
+        -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 45%, #000 25%, transparent 75%);
+        mask-image: radial-gradient(ellipse 80% 75% at 50% 45%, #000 25%, transparent 75%);
+      }
+      .orb { position: absolute; border-radius: 50%; }
+      #orb1 { width: 780px; height: 780px; left: 4%; top: 4%; background: radial-gradient(circle, rgba(99,102,241,0.20), transparent 66%); }
+      #orb2 { width: 920px; height: 920px; left: 55%; top: 46%; background: radial-gradient(circle, rgba(6,182,212,0.14), transparent 66%); }
+      #orb3 { width: 540px; height: 540px; left: 40%; top: -14%; background: radial-gradient(circle, rgba(167,139,250,0.12), transparent 66%); }
+      #vig { position: absolute; inset: 0; background: radial-gradient(ellipse 92% 88% at 50% 50%, transparent 55%, rgba(2,5,12,0.6) 100%); }
+
+      /* ---------- Persistent UI overlay ---------- */
+      .corner {
+        position: absolute; top: 36px;
+        font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        font-size: 15px; letter-spacing: 0.28em; color: #5b6b85; font-weight: 600;
+      }
+      .cl { left: 52px; }
+      .cr { right: 52px; }
+      #progress {
+        position: absolute; left: 0; bottom: 0; height: 4px; width: 100%;
+        transform-origin: left center;
+        background: linear-gradient(90deg, #4f46e5, #6366f1 40%, #22d3ee);
+        box-shadow: 0 0 16px rgba(34,211,238,0.45);
+      }
+
+      /* ---------- Shared components ---------- */
+      .pill {
+        display: inline-flex; align-items: center; gap: 12px;
+        padding: 11px 24px; border-radius: 9999px;
+        background: rgba(99,102,241,0.12); border: 1px solid rgba(129,140,248,0.35);
+        color: #a5b4fc; font-size: 18px; font-weight: 700;
+        letter-spacing: 0.22em; text-transform: uppercase;
+      }
+      .pill-dot { width: 9px; height: 9px; border-radius: 50%; background: #22d3ee; box-shadow: 0 0 12px rgba(34,211,238,0.9); }
+      .head-xl { font-size: 64px; font-weight: 800; line-height: 1.14; text-align: center; letter-spacing: -0.01em; }
+      .hl-line { display: block; }
+      .grad-text {
+        font-style: normal;
+        background: linear-gradient(100deg, #a5b4fc 0%, #67e8f9 55%, #22d3ee 100%);
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent; color: transparent;
+      }
+      .sub { font-size: 28px; color: #94a3b8; font-weight: 500; text-align: center; }
+
+      /* ---------- Scene 1 : Hook ---------- */
+      #s1-inner { gap: 26px; }
+      #s1-svg { margin-top: 8px; }
+      .toktext { fill: #cbd5e1; font-weight: 600; dominant-baseline: central; }
+      #s1-svg .toktext { font-size: 26px; }
+      #s1-svg .tokbox { fill: rgba(255,255,255,0.045); stroke: rgba(148,163,184,0.32); stroke-width: 1.5; }
+      .svg-label { fill: #8ea3bd; font-size: 20px; font-style: italic; }
+
+      /* ---------- Scene 2 : Transformers ---------- */
+      #s2-inner { gap: 0; }
+      #s2-kicker { display: flex; align-items: center; gap: 20px; margin-bottom: 34px; }
+      #s2-ktext { display: inline-block; font-size: 23px; color: #94a3b8; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; }
+      .s2-dash { display: inline-block; width: 76px; height: 2px; border-radius: 2px; background: rgba(148,163,184,0.45); }
+      #s2-title { font-size: 138px; font-weight: 900; line-height: 1; letter-spacing: 0.015em; }
+      .ltr {
+        display: inline-block;
+        background: linear-gradient(180deg, #f8fafc 12%, #a5b4fc 58%, #38bdf8 115%);
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+      #s2-line {
+        width: 580px; height: 5px; border-radius: 4px; margin-top: 34px;
+        background: linear-gradient(90deg, rgba(99,102,241,0), #6366f1 22%, #22d3ee 78%, rgba(34,211,238,0));
+        box-shadow: 0 0 24px rgba(56,189,248,0.4);
+      }
+      #s2-sub { font-size: 30px; color: #94a3b8; font-weight: 500; margin-top: 32px; }
+
+      /* ---------- Scene 3 : Attention ---------- */
+      #s3-inner { gap: 18px; }
+      #s3-svg .toktext { font-size: 23px; }
+      #s3-svg .tokbox { fill: rgba(255,255,255,0.045); stroke: rgba(148,163,184,0.32); stroke-width: 1.5; }
+      #s3-tok-it .tokbox { fill: rgba(99,102,241,0.12); stroke: #818cf8; }
+      #s3-tok-it .toktext { fill: #e0e7ff; }
+      .s3-arc { fill: none; stroke-linecap: round; }
+      .s3-arc-w { stroke: rgba(120,134,156,0.55); stroke-width: 1.4; }
+      #s3-arc-tired { stroke: rgba(34,211,238,0.85); stroke-width: 2.6; }
+      #s3-arc-animal { stroke: url(#s3-grad); stroke-width: 4.5; }
+      .wpill { fill: rgba(6,12,24,0.88); stroke: rgba(34,211,238,0.5); stroke-width: 1; }
+      .wtext { fill: #67e8f9; font-size: 16px; font-weight: 700; dominant-baseline: central; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+      .s3-caps { position: relative; height: 64px; width: 1240px; margin-top: -28px; }
+      .s3-cap { position: absolute; left: 0; right: 0; top: 0; text-align: center; font-size: 26px; color: #94a3b8; font-weight: 500; }
+      .s3-cap strong { color: #e2e8f0; font-weight: 700; }
+
+      /* ---------- Scene 4 : Applications ---------- */
+      #s4-inner { gap: 26px; }
+      .cards { display: flex; gap: 26px; margin-top: 16px; }
+      .card {
+        width: 344px; padding: 34px 24px 30px; border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
+        border: 1px solid rgba(255,255,255,0.09);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+        display: flex; flex-direction: column; align-items: center; text-align: center; gap: 13px;
+      }
+      .card-icon { width: 66px; height: 66px; border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+      .card-icon svg { width: 32px; height: 32px; }
+      .c-ind { color: #818cf8; background: rgba(99,102,241,0.14); border: 1px solid rgba(129,140,248,0.35); }
+      .c-cyan { color: #22d3ee; background: rgba(34,211,238,0.12); border: 1px solid rgba(34,211,238,0.32); }
+      .c-em { color: #34d399; background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.32); }
+      .c-vio { color: #c084fc; background: rgba(192,132,252,0.12); border: 1px solid rgba(192,132,252,0.32); }
+      .card-title { font-size: 27px; font-weight: 800; }
+      .card-sub { font-size: 18px; color: #94a3b8; font-weight: 500; }
+      #s4-foot { font-size: 25px; color: #94a3b8; margin-top: 18px; font-weight: 500; }
+      #s4-foot strong { color: #e2e8f0; font-weight: 700; }
+
+      /* ---------- Scene 5 : Question ---------- */
+      #s5-inner { gap: 36px; }
+      .s5-stack { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+      #s5-glow {
+        position: absolute; left: 50%; top: 50%; width: 1060px; height: 380px;
+        margin-left: -530px; margin-top: -190px;
+        background: radial-gradient(closest-side, rgba(34,211,238,0.20), transparent 72%);
+      }
+      #s5-l1 { position: relative; font-size: 46px; color: #cbd5e1; font-weight: 600; }
+      #s5-l2 {
+        position: relative; font-size: 102px; font-weight: 900; letter-spacing: 0.005em;
+        background: linear-gradient(115deg, #f8fafc 20%, #a5f3fc 58%, #22d3ee 100%);
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      }
+
+      /* ---------- Scene 6 : The paper ---------- */
+      #s6-lead { font-size: 30px; color: #cbd5e1; font-weight: 500; margin-bottom: 42px; }
+      .paper-wrap { position: relative; }
+      #s6-glow {
+        position: absolute; left: 50%; top: 50%; width: 1160px; height: 600px;
+        margin-left: -580px; margin-top: -300px;
+        background: radial-gradient(closest-side, rgba(99,102,241,0.38), rgba(34,211,238,0.10) 58%, transparent 80%);
+      }
+      #s6-card {
+        position: relative; width: 940px; border-radius: 10px; padding: 40px 60px 36px;
+        background: linear-gradient(180deg, #fdfdfa, #f4f2ea); text-align: center;
+        box-shadow: 0 40px 90px rgba(0,0,0,0.6), 0 12px 32px rgba(0,0,0,0.35);
+      }
+      .paper-head { display: flex; justify-content: space-between; }
+      .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 15px; color: #8a94a6; letter-spacing: 0.02em; }
+      .paper-rule { height: 1px; background: rgba(15,23,42,0.12); margin: 16px 0; }
+      .paper-title-row { position: relative; display: inline-block; padding: 6px 16px; margin: 20px 0 16px; }
+      #s6-hl {
+        position: absolute; top: 6px; bottom: 6px; left: -4px; right: -4px;
+        border-radius: 8px; background: rgba(252,211,77,0.5); transform-origin: left center;
+      }
+      .paper-title {
+        position: relative; font-family: Georgia, "Times New Roman", serif;
+        font-size: 55px; font-weight: 700; color: #101828; letter-spacing: -0.015em; line-height: 1.12;
+      }
+      .paper-authors { font-size: 16.5px; color: #475569; line-height: 1.75; max-width: 740px; margin: 0 auto; font-weight: 500; }
+      .paper-affil { font-size: 15.5px; color: #7c8698; letter-spacing: 0.03em; font-weight: 600; }
+      #s6-cap { margin-top: 40px; font-size: 26px; color: #94a3b8; font-weight: 500; letter-spacing: 0.01em; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="33">
+
+      <!-- ================= Persistent background ================= -->
+      <section class="clip" id="bg" data-start="0" data-duration="33">
+        <div id="bgBase"></div>
+        <div id="bgGrid"><div class="grid"></div></div>
+        <div class="orb" id="orb1"></div>
+        <div class="orb" id="orb2"></div>
+        <div class="orb" id="orb3"></div>
+        <div id="vig"></div>
+      </section>
+
+      <!-- ================= Scene 1 · Hook (0 – 6.5s) ================= -->
+      <section class="clip scene" id="s1" data-start="0" data-duration="6.5">
+        <div class="inner" id="s1-inner">
+          <div class="pill hide" id="s1-pill"><span class="pill-dot"></span>The story of modern AI</div>
+          <h1 class="head-xl">
+            <span class="hl-line hide" id="s1-l1">What if a machine could understand</span>
+            <span class="hl-line hide" id="s1-l2">the relationship between <em class="grad-text">every word</em>?</span>
+          </h1>
+          <p class="sub hide" id="s1-sub">No matter how far apart they are.</p>
+          <svg id="s1-svg" width="1560" height="240" viewBox="0 0 1560 240">
+            <defs>
+              <linearGradient id="s1-grad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#818cf8"/>
+                <stop offset="1" stop-color="#22d3ee"/>
+              </linearGradient>
+            </defs>
+            <path id="s1-arc" class="hide" d="M 280 132 Q 755 12 1230 132" fill="none" stroke="url(#s1-grad)" stroke-width="4" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <text id="s1-arclabel" class="svg-label hide" x="755" y="42" text-anchor="middle">a long-range dependency</text>
+            <circle id="s1-n1" class="hide" cx="280" cy="132" r="6" fill="#22d3ee"/>
+            <circle id="s1-n2" class="hide" cx="1230" cy="132" r="6" fill="#22d3ee"/>
+            <g class="s1-tok hide"><rect class="tokbox" x="15" y="140" width="150" height="60" rx="30"/><text class="toktext" x="90" y="170" text-anchor="middle">The</text></g>
+            <g class="s1-tok hide"><rect id="s1-r1" class="tokbox" x="205" y="140" width="150" height="60" rx="30"/><text id="s1-t1" class="toktext" x="280" y="170" text-anchor="middle">robot</text></g>
+            <g class="s1-tok hide"><rect class="tokbox" x="395" y="140" width="150" height="60" rx="30"/><text class="toktext" x="470" y="170" text-anchor="middle">that</text></g>
+            <g class="s1-tok hide"><rect class="tokbox" x="585" y="140" width="150" height="60" rx="30"/><text class="toktext" x="660" y="170" text-anchor="middle">built</text></g>
+            <g class="s1-tok hide"><rect class="tokbox" x="775" y="140" width="150" height="60" rx="30"/><text class="toktext" x="850" y="170" text-anchor="middle">the</text></g>
+            <g class="s1-tok hide"><rect class="tokbox" x="965" y="140" width="150" height="60" rx="30"/><text class="toktext" x="1040" y="170" text-anchor="middle">car</text></g>
+            <g class="s1-tok hide"><rect id="s1-r6" class="tokbox" x="1155" y="140" width="150" height="60" rx="30"/><text id="s1-t6" class="toktext" x="1230" y="170" text-anchor="middle">was</text></g>
+            <g class="s1-tok hide"><rect class="tokbox" x="1345" y="140" width="150" height="60" rx="30"/><text class="toktext" x="1420" y="170" text-anchor="middle">proud</text></g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- ================= Scene 2 · Transformers (6.5 – 10s) ================= -->
+      <section class="clip scene" id="s2" data-start="6.5" data-duration="3.5">
+        <div class="inner" id="s2-inner">
+          <div id="s2-kicker">
+            <span class="s2-dash hide"></span>
+            <span id="s2-ktext" class="hide">That’s the idea behind</span>
+            <span class="s2-dash hide"></span>
+          </div>
+          <h1 id="s2-title"><span class="ltr hide">T</span><span class="ltr hide">R</span><span class="ltr hide">A</span><span class="ltr hide">N</span><span class="ltr hide">S</span><span class="ltr hide">F</span><span class="ltr hide">O</span><span class="ltr hide">R</span><span class="ltr hide">M</span><span class="ltr hide">E</span><span class="ltr hide">R</span><span class="ltr hide">S</span></h1>
+          <div id="s2-line" class="hide"></div>
+          <p id="s2-sub" class="hide">The architecture behind modern AI.</p>
+        </div>
+      </section>
+
+      <!-- ================= Scene 3 · Attention (10 – 17s) ================= -->
+      <section class="clip scene" id="s3" data-start="10" data-duration="7">
+        <div class="inner" id="s3-inner">
+          <div class="pill hide" id="s3-pill"><span class="pill-dot"></span>Introduced in 2017</div>
+          <h2 class="head-xl hide" id="s3-head">A mechanism called <span class="grad-text">Attention</span></h2>
+          <svg id="s3-svg" width="1640" height="330" viewBox="0 0 1640 330">
+            <defs>
+              <linearGradient id="s3-grad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#818cf8"/>
+                <stop offset="1" stop-color="#22d3ee"/>
+              </linearGradient>
+              <radialGradient id="s3-halo-grad">
+                <stop offset="0" stop-color="rgba(99,102,241,0.55)"/>
+                <stop offset="0.6" stop-color="rgba(99,102,241,0.18)"/>
+                <stop offset="1" stop-color="rgba(99,102,241,0)"/>
+              </radialGradient>
+              <linearGradient id="s3-scan-grad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="rgba(34,211,238,0)"/>
+                <stop offset="0.5" stop-color="rgba(34,211,238,0.32)"/>
+                <stop offset="1" stop-color="rgba(34,211,238,0)"/>
+              </linearGradient>
+            </defs>
+
+            <circle id="s3-halo" class="hide" cx="1120" cy="240" r="62" fill="url(#s3-halo-grad)"/>
+
+            <!-- attention rays from the query word "it" -->
+            <path class="s3-arc s3-arc-w hide" d="M 1120 204 Q 595 -30 70 204" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path class="s3-arc s3-arc-w hide" d="M 1120 204 Q 745 -30 370 204" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path class="s3-arc s3-arc-w hide" d="M 1120 204 Q 820 -30 520 204" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path class="s3-arc s3-arc-w hide" d="M 1120 204 Q 895 -30 670 204" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path class="s3-arc s3-arc-w hide" d="M 1120 204 Q 970 -30 820 204" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path class="s3-arc s3-arc-w hide" d="M 1120 204 Q 1045 -30 970 204" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path class="s3-arc s3-arc-w hide" d="M 1120 204 Q 1195 -30 1270 204" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path class="s3-arc s3-arc-w hide" d="M 1120 204 Q 1270 -30 1420 204" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path id="s3-arc-tired" class="s3-arc hide" d="M 1120 204 Q 1345 -30 1570 204" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+            <path id="s3-arc-animal" class="s3-arc hide" d="M 1120 204 Q 670 -30 220 204" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+
+            <!-- tokens -->
+            <g class="s3-tok hide"><rect class="tokbox s3-flash" x="12" y="210" width="116" height="60" rx="30"/><text class="toktext" x="70" y="240" text-anchor="middle">The</text></g>
+            <g class="s3-tok hide" id="s3-tok-animal"><rect class="tokbox s3-flash" x="162" y="210" width="116" height="60" rx="30"/><text class="toktext" x="220" y="240" text-anchor="middle">animal</text></g>
+            <g class="s3-tok hide"><rect class="tokbox s3-flash" x="312" y="210" width="116" height="60" rx="30"/><text class="toktext" x="370" y="240" text-anchor="middle">didn’t</text></g>
+            <g class="s3-tok hide"><rect class="tokbox s3-flash" x="462" y="210" width="116" height="60" rx="30"/><text class="toktext" x="520" y="240" text-anchor="middle">cross</text></g>
+            <g class="s3-tok hide"><rect class="tokbox s3-flash" x="612" y="210" width="116" height="60" rx="30"/><text class="toktext" x="670" y="240" text-anchor="middle">the</text></g>
+            <g class="s3-tok hide"><rect class="tokbox s3-flash" x="762" y="210" width="116" height="60" rx="30"/><text class="toktext" x="820" y="240" text-anchor="middle">street</text></g>
+            <g class="s3-tok hide"><rect class="tokbox s3-flash" x="912" y="210" width="116" height="60" rx="30"/><text class="toktext" x="970" y="240" text-anchor="middle">because</text></g>
+            <g class="s3-tok hide" id="s3-tok-it"><rect class="tokbox s3-flash" x="1062" y="210" width="116" height="60" rx="30"/><text class="toktext" x="1120" y="240" text-anchor="middle">it</text></g>
+            <g class="s3-tok hide"><rect class="tokbox s3-flash" x="1212" y="210" width="116" height="60" rx="30"/><text class="toktext" x="1270" y="240" text-anchor="middle">was</text></g>
+            <g class="s3-tok hide"><rect class="tokbox s3-flash" x="1362" y="210" width="116" height="60" rx="30"/><text class="toktext" x="1420" y="240" text-anchor="middle">too</text></g>
+            <g class="s3-tok hide"><rect class="tokbox s3-flash" x="1512" y="210" width="116" height="60" rx="30"/><text class="toktext" x="1570" y="240" text-anchor="middle">tired</text></g>
+
+            <!-- sequential scan beam -->
+            <rect id="s3-scanline" x="0" y="190" width="130" height="96" fill="url(#s3-scan-grad)" opacity="0"/>
+
+            <!-- attention weights -->
+            <g class="s3-wlabel hide"><rect class="wpill" x="632" y="42" width="76" height="27" rx="13.5"/><text class="wtext" x="670" y="55.5" text-anchor="middle">0.72</text></g>
+            <g class="s3-wlabel hide"><rect class="wpill" x="1307" y="42" width="76" height="27" rx="13.5"/><text class="wtext" x="1345" y="55.5" text-anchor="middle">0.31</text></g>
+          </svg>
+          <div class="s3-caps">
+            <p class="s3-cap hide" id="s3-capA">Sequential reading: one word at a time…</p>
+            <p class="s3-cap hide" id="s3-capB">Attention: <strong>every word, all at once</strong> — weighted by importance.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Scene 4 · Applications (17 – 23s) ================= -->
+      <section class="clip scene" id="s4" data-start="17" data-duration="6">
+        <div class="inner" id="s4-inner">
+          <div class="pill hide" id="s4-pill"><span class="pill-dot"></span>One idea, everywhere</div>
+          <h2 class="head-xl hide" id="s4-head">The foundation of <span class="grad-text">modern AI</span></h2>
+          <div class="cards">
+            <div class="card hide">
+              <div class="card-icon c-ind"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z"/></svg></div>
+              <div class="card-title">ChatGPT</div>
+              <div class="card-sub">Conversational AI</div>
+            </div>
+            <div class="card hide">
+              <div class="card-icon c-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19"/><path d="M12 2.5a14.5 14.5 0 0 1 3.8 9.5 14.5 14.5 0 0 1-3.8 9.5 14.5 14.5 0 0 1-3.8-9.5 14.5 14.5 0 0 1 3.8-9.5z"/></svg></div>
+              <div class="card-title">Translation</div>
+              <div class="card-sub">Any language, instantly</div>
+            </div>
+            <div class="card hide">
+              <div class="card-icon c-em"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M21 15.5l-5-5L5.5 21"/></svg></div>
+              <div class="card-title">Image Generation</div>
+              <div class="card-sub">Text to pixels</div>
+            </div>
+            <div class="card hide">
+              <div class="card-icon c-vio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg></div>
+              <div class="card-title">Coding Assistants</div>
+              <div class="card-sub">Pair programming</div>
+            </div>
+          </div>
+          <p id="s4-foot" class="hide"><strong>One simple idea</strong> — powering them all.</p>
+        </div>
+      </section>
+
+      <!-- ================= Scene 5 · The question (23 – 26.5s) ================= -->
+      <section class="clip scene" id="s5" data-start="23" data-duration="3.5">
+        <div class="inner" id="s5-inner">
+          <div class="pill hide" id="s5-pill"><span class="pill-dot"></span>The big question</div>
+          <div class="s5-stack">
+            <div id="s5-glow" class="hide"></div>
+            <div id="s5-l1" class="hide">But how did this architecture</div>
+            <h2 id="s5-l2" class="hide">become so powerful?</h2>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= Scene 6 · The paper (26.5 – 33s) ================= -->
+      <section class="clip scene" id="s6" data-start="26.5" data-duration="6.5">
+        <div class="inner" id="s6-inner">
+          <p id="s6-lead" class="hide">Let’s start with the breakthrough that changed AI forever</p>
+          <div class="paper-wrap">
+            <div id="s6-glow" class="hide"></div>
+            <div id="s6-card" class="hide">
+              <div class="paper-head s6-line"><span class="mono">arXiv:1706.03762 [cs.CL]</span><span class="mono">June 2017</span></div>
+              <div class="paper-rule s6-line"></div>
+              <div class="paper-title-row s6-line">
+                <div id="s6-hl" class="hide"></div>
+                <h2 class="paper-title">Attention Is All You Need</h2>
+              </div>
+              <p class="paper-authors s6-line">Ashish Vaswani · Noam Shazeer · Niki Parmar · Jakob Uszkoreit · Llion Jones · Aidan N. Gomez · Łukasz Kaiser · Illia Polosukhin</p>
+              <div class="paper-rule s6-line"></div>
+              <p class="paper-affil s6-line">Google Brain · Google Research · University of Toronto</p>
+            </div>
+          </div>
+          <p id="s6-cap" class="hide">This is where the story begins.</p>
+        </div>
+      </section>
+
+      <!-- ================= Persistent UI overlay ================= -->
+      <div class="clip" id="ui" data-start="0" data-duration="33">
+        <div class="corner cl hide" id="cornerL">TRANSFORMERS · THE ORIGIN</div>
+        <div class="corner cr hide" id="cornerR">PART 01 — ATTENTION</div>
+        <div id="progress"></div>
+      </div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      /* ================= Background & UI (0 – 33s) ================= */
+      tl.fromTo("#bgGrid", { x: 0, y: 0 }, { x: 64, y: 64, duration: 16.5, ease: "none", repeat: 1, yoyo: true }, 0);
+      tl.to("#orb1", { x: 70, y: 45, duration: 16.5, ease: "sine.inOut", repeat: 1, yoyo: true }, 0);
+      tl.to("#orb2", { x: -80, y: -55, duration: 16.5, ease: "sine.inOut", repeat: 1, yoyo: true }, 0);
+      tl.to("#orb3", { x: 45, y: -50, duration: 11, ease: "sine.inOut", repeat: 2, yoyo: true }, 0);
+      tl.fromTo("#progress", { scaleX: 0 }, { scaleX: 1, duration: 33, ease: "none" }, 0);
+      tl.fromTo("#cornerL, #cornerR", { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", stagger: 0.12 }, 0.4);
+
+      /* ================= Scene 1 · Hook (0 – 6.5s) ================= */
+      tl.fromTo("#s1-pill", { opacity: 0, y: -16, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "back.out(1.6)" }, 0.15);
+      tl.fromTo("#s1-pill .pill-dot", { opacity: 0.35 }, { opacity: 1, duration: 0.8, ease: "sine.inOut", repeat: 5, yoyo: true }, 0.85);
+      tl.fromTo("#s1-l1", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.45);
+      tl.fromTo("#s1-l2", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" }, 0.62);
+      tl.fromTo("#s1-sub", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 0.95);
+      tl.fromTo(".s1-tok", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.5)", stagger: 0.07 }, 1.35);
+      tl.fromTo("#s1-arc", { opacity: 0 }, { opacity: 1, duration: 0.18, ease: "none" }, 2.6);
+      tl.fromTo("#s1-arc", { attr: { strokeDashoffset: 1 } }, { attr: { strokeDashoffset: 0 }, duration: 0.85, ease: "power2.inOut" }, 2.6);
+      tl.fromTo("#s1-n1", { opacity: 1, scale: 0, transformOrigin: "center" }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.4)" }, 3.4);
+      tl.fromTo("#s1-n2", { opacity: 1, scale: 0, transformOrigin: "center" }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.4)" }, 3.48);
+      tl.to("#s1-r1, #s1-r6", { fill: "rgba(34,211,238,0.10)", stroke: "#22d3ee", duration: 0.45, ease: "power2.out" }, 3.42);
+      tl.to("#s1-t1, #s1-t6", { fill: "#f0f9ff", duration: 0.45, ease: "power2.out" }, 3.42);
+      tl.fromTo("#s1-arclabel", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.55, ease: "power2.out" }, 3.55);
+      tl.to("#s1-n1, #s1-n2", { scale: 1.4, transformOrigin: "center", duration: 0.75, ease: "sine.inOut", repeat: 2, yoyo: true }, 4.15);
+      tl.to("#s1-inner", { opacity: 0, y: -26, duration: 0.5, ease: "power2.in" }, 5.92);
+
+      /* ================= Scene 2 · Transformers (6.5 – 10s) ================= */
+      tl.fromTo("#s2-ktext", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 6.72);
+      tl.fromTo(".s2-dash", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.55, ease: "power2.out", stagger: 0.08 }, 6.8);
+      tl.fromTo(".ltr", { opacity: 0, y: 70, scale: 0.65 }, { opacity: 1, y: 0, scale: 1, duration: 0.62, ease: "back.out(1.8)", stagger: 0.045 }, 6.95);
+      tl.fromTo("#s2-line", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.7, ease: "power3.inOut" }, 7.95);
+      tl.fromTo("#s2-sub", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 8.25);
+      tl.to("#s2-line", { boxShadow: "0 0 36px rgba(56,189,248,0.95)", duration: 0.7, ease: "sine.inOut", repeat: 1, yoyo: true }, 8.65);
+      tl.to("#s2-inner", { opacity: 0, y: -24, duration: 0.45, ease: "power2.in" }, 9.5);
+
+      /* ================= Scene 3 · Attention (10 – 17s) ================= */
+      tl.fromTo("#s3-pill", { opacity: 0, y: -14, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 10.15);
+      tl.fromTo("#s3-pill .pill-dot", { opacity: 0.35 }, { opacity: 1, duration: 0.8, ease: "sine.inOut", repeat: 6, yoyo: true }, 10.8);
+      tl.fromTo("#s3-head", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 10.45);
+      tl.fromTo(".s3-tok", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.5)", stagger: 0.06 }, 11.0);
+
+      // old way: a scanning beam sweeps left → right, flashing one token at a time
+      tl.fromTo("#s3-scanline", { x: -160, opacity: 1 }, { x: 1680, duration: 1.0, ease: "none" }, 11.8);
+      tl.to(".s3-flash", { fill: "rgba(129,140,248,0.32)", duration: 0.15, ease: "power1.inOut", repeat: 1, yoyo: true, stagger: 0.082 }, 11.82);
+      tl.to("#s3-scanline", { opacity: 0, duration: 0.22, ease: "power1.out" }, 12.72);
+      tl.fromTo("#s3-capA", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 11.95);
+      tl.to("#s3-capA", { opacity: 0, y: -8, duration: 0.28, ease: "power2.in" }, 12.8);
+
+      // new way: the query word "it" lights up
+      tl.to("#s3-tok-it rect", { fill: "rgba(99,102,241,0.34)", duration: 0.4, ease: "power2.out" }, 12.9);
+      tl.to("#s3-tok-it", { scale: 1.14, transformOrigin: "center", duration: 0.22, ease: "power2.out" }, 12.9);
+      tl.to("#s3-tok-it", { scale: 1, duration: 0.38, ease: "power2.inOut" }, 13.12);
+      tl.fromTo("#s3-halo", { opacity: 0, scale: 0.3, transformOrigin: "center" }, { opacity: 1, scale: 1, duration: 0.65, ease: "back.out(1.7)" }, 12.82);
+      tl.to("#s3-halo", { opacity: 0.55, duration: 0.9, ease: "sine.inOut", repeat: 3, yoyo: true }, 13.6);
+      tl.fromTo("#s3-capB", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" }, 13.15);
+
+      // attention rays burst outward
+      tl.fromTo(".s3-arc-w", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "none", stagger: 0.05 }, 13.25);
+      tl.fromTo(".s3-arc-w", { attr: { strokeDashoffset: 1 } }, { attr: { strokeDashoffset: 0 }, duration: 0.55, ease: "power2.out", stagger: 0.05 }, 13.25);
+      tl.fromTo("#s3-arc-tired", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "none" }, 14.0);
+      tl.fromTo("#s3-arc-tired", { attr: { strokeDashoffset: 1 } }, { attr: { strokeDashoffset: 0 }, duration: 0.6, ease: "power2.out" }, 14.0);
+      tl.fromTo("#s3-arc-animal", { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "none" }, 14.25);
+      tl.fromTo("#s3-arc-animal", { attr: { strokeDashoffset: 1 } }, { attr: { strokeDashoffset: 0 }, duration: 0.7, ease: "power3.out" }, 14.25);
+
+      // strongest connection: "it" → "animal"
+      tl.to("#s3-tok-animal rect", { fill: "rgba(34,211,238,0.16)", stroke: "#22d3ee", duration: 0.4, ease: "power2.out" }, 14.75);
+      tl.to("#s3-tok-animal text", { fill: "#ecfeff", duration: 0.4, ease: "power2.out" }, 14.75);
+      tl.to("#s3-tok-animal", { scale: 1.12, transformOrigin: "center", duration: 0.2, ease: "power2.out" }, 14.75);
+      tl.to("#s3-tok-animal", { scale: 1, duration: 0.35, ease: "power2.inOut" }, 14.95);
+      tl.fromTo(".s3-wlabel", { opacity: 0, scale: 0.3, transformOrigin: "center" }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.2)", stagger: 0.12 }, 15.0);
+      tl.to("#s3-inner", { opacity: 0, y: -26, duration: 0.5, ease: "power2.in" }, 16.5);
+
+      /* ================= Scene 4 · Applications (17 – 23s) ================= */
+      tl.fromTo("#s4-pill", { opacity: 0, y: -14, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 17.15);
+      tl.fromTo("#s4-head", { opacity: 0, y: 34 }, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 17.42);
+      tl.fromTo(".card", { opacity: 0, y: 72, scale: 0.93 }, { opacity: 1, y: 0, scale: 1, duration: 0.72, ease: "back.out(1.35)", stagger: 0.12 }, 17.8);
+      tl.to(".card", { y: -10, duration: 0.3, ease: "power2.inOut", repeat: 1, yoyo: true, stagger: 0.17 }, 19.85);
+      tl.fromTo("#s4-foot", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.55, ease: "power2.out" }, 20.75);
+      tl.to("#s4-inner", { opacity: 0, y: -24, duration: 0.5, ease: "power2.in" }, 22.5);
+
+      /* ================= Scene 5 · The question (23 – 26.5s) ================= */
+      tl.fromTo("#s5-pill", { opacity: 0, y: -14, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 23.2);
+      tl.fromTo("#s5-l1", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 23.45);
+      tl.fromTo("#s5-glow", { opacity: 0, scale: 0.7 }, { opacity: 0.6, scale: 1, duration: 1.4, ease: "power2.out" }, 23.75);
+      tl.fromTo("#s5-l2", { opacity: 0, y: 44, letterSpacing: "0.1em" }, { opacity: 1, y: 0, letterSpacing: "0.005em", duration: 1.0, ease: "power4.out" }, 23.75);
+      tl.to("#s5-glow", { opacity: 0.32, scale: 1.05, duration: 1.15, ease: "sine.inOut", repeat: 1, yoyo: true }, 25.15);
+      tl.to("#s5-inner", { opacity: 0, y: -22, duration: 0.45, ease: "power2.in" }, 26.0);
+
+      /* ================= Scene 6 · The paper (26.5 – 33s) ================= */
+      tl.fromTo("#s6-lead", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" }, 26.75);
+      tl.fromTo("#s6-glow", { opacity: 0, scale: 0.55 }, { opacity: 0.65, scale: 1.05, duration: 1.35, ease: "power2.out" }, 27.05);
+      tl.fromTo("#s6-card", { opacity: 0, y: 90, rotation: 5 }, { opacity: 1, y: 0, rotation: -0.8, duration: 0.95, ease: "power3.out" }, 27.2);
+      tl.fromTo(".s6-line", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out", stagger: 0.11 }, 27.7);
+      tl.fromTo("#s6-hl", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.75, ease: "power2.inOut" }, 28.75);
+      tl.fromTo("#s6-cap", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 29.5);
+      tl.to("#s6-glow", { opacity: 0.35, duration: 1.5, ease: "sine.inOut", repeat: 1, yoyo: true }, 30.3);
+      tl.to("#s6-inner", { opacity: 0, y: -26, duration: 0.55, ease: "power2.in" }, 32.4);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

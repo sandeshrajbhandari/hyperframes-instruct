@@ -7,12 +7,13 @@ import {
   FileCode,
   Sparkles,
   ClipboardPaste,
+  FolderOpen,
 } from 'lucide-react';
 
 export default function NewProjectModal({ isOpen, onClose, onCreate }) {
   const [title, setTitle] = useState('');
   const [aspectRatio, setAspectRatio] = useState('16:9');
-  const [templateType, setTemplateType] = useState('starter'); // 'starter', 'blank', 'paste'
+  const [templateType, setTemplateType] = useState('starter'); // 'starter', 'bermuda', 'blank', 'paste'
   const [pastedCode, setPastedCode] = useState('');
 
   if (!isOpen) return null;
@@ -23,6 +24,20 @@ export default function NewProjectModal({ isOpen, onClose, onCreate }) {
     const isVertical = aspectRatio === '9:16';
     const width = isVertical ? 1080 : 1920;
     const height = isVertical ? 1920 : 1080;
+
+    if (templateType === 'bermuda') {
+      onCreate({
+        title: title.trim() || 'The Bermuda Triangle Mystery',
+        width: 1920,
+        height: 1080,
+        duration: 46,
+        template: 'bermuda',
+      });
+      setTitle('');
+      setPastedCode('');
+      onClose();
+      return;
+    }
 
     let html = '';
     if (templateType === 'paste' && pastedCode.trim()) {
@@ -167,7 +182,7 @@ export default function NewProjectModal({ isOpen, onClose, onCreate }) {
             <label className="block text-xs font-semibold text-slate-300 mb-1.5">
               Initial Content
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               <button
                 type="button"
                 onClick={() => setTemplateType('starter')}
@@ -179,6 +194,19 @@ export default function NewProjectModal({ isOpen, onClose, onCreate }) {
               >
                 <Sparkles className="w-4 h-4 mx-auto mb-1 text-indigo-400" />
                 Starter Sample
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTemplateType('bermuda')}
+                className={`p-2.5 rounded-xl border text-center text-xs transition-all ${
+                  templateType === 'bermuda'
+                    ? 'bg-cyan-600/20 border-cyan-500 text-cyan-200 font-semibold'
+                    : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <FolderOpen className="w-4 h-4 mx-auto mb-1 text-cyan-400" />
+                Bermuda (VO)
               </button>
 
               <button

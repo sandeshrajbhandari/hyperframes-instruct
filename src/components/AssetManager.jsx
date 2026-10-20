@@ -12,12 +12,20 @@ import {
   Sparkles,
   FileAudio,
   FolderOpen,
+  Mic,
 } from 'lucide-react';
 
-export default function AssetManager({ projectId, projectTitle, onInsertSnippet }) {
+export default function AssetManager({
+  projectId,
+  projectTitle,
+  onInsertSnippet,
+  onOpenTranscription,
+  onOpenPromptHelper,
+}) {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [loadingBermuda, setLoadingBermuda] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
@@ -99,6 +107,25 @@ export default function AssetManager({ projectId, projectTitle, onInsertSnippet 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   };
 
+  const handleLoadBermuda = async () => {
+    setLoadingBermuda(true);
+    try {
+      const res = await fetch(`/api/projects/${projectId}/load-bermuda-assets`, {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (data.success) {
+        await loadAssets();
+      } else {
+        alert(data.error || 'Failed to load Bermuda assets');
+      }
+    } catch (err) {
+      alert('Error loading Bermuda assets: ' + err.message);
+    } finally {
+      setLoadingBermuda(false);
+    }
+  };
+
   const copyAllForPrompt = () => {
     if (assets.length === 0) return;
     let md = `### Available Project Assets in assets/:\n`;
@@ -128,25 +155,50 @@ export default function AssetManager({ projectId, projectTitle, onInsertSnippet 
           </p>
         </div>
 
-        {assets.length > 0 && (
+        <div className="flex items-center gap-2">
           <button
-            onClick={copyAllForPrompt}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
-            title="Copy list of asset paths formatted for ChatGPT prompt"
+            onClick={handleLoadBermuda}
+            disabled={loadingBermuda}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-800/60 transition-all cursor-pointer"
+            title="Copy Bermuda Triangle voiceover (.wav) and 3 scene images into this project"
           >
-            {copiedId === 'all-prompt' ? (
-              <>
-                <Check className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400">Copied Asset List!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Copy Asset List for Prompt</span>
-              </>
-            )}
+            <FolderOpen className="w-3.5 h-3.5 text-cyan-400" />
+            <span>{loadingBermuda ? 'Loading Bermuda Assets...' : 'Load Bermuda Example Assets'}</span>
           </button>
-        )}
+
+          {assets.length > 0 && (
+            <>
+              {onOpenPromptHelper && (
+                <button
+                  onClick={onOpenPromptHelper}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-indigo-600/30 to-cyan-600/30 hover:from-indigo-600/40 hover:to-cyan-600/40 text-indigo-200 border border-indigo-500/40 transition-all cursor-pointer shadow-sm"
+                  title="Open AI Prompt Creator with these assets pre-loaded"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Generate Prompt with Assets</span>
+                </button>
+              )}
+
+              <button
+                onClick={copyAllForPrompt}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors"
+                title="Copy list of asset paths formatted for ChatGPT prompt"
+              >
+                {copiedId === 'all-prompt' ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="text-emerald-400">Copied Asset List!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Copy Asset List for Prompt</span>
+                  </>
+                )}
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Drag & Drop Zone */}
@@ -311,6 +363,17 @@ export default function AssetManager({ projectId, projectTitle, onInsertSnippet 
                         </>
                       )}
                     </button>
+
+                    {isAudio && onOpenTranscription && (
+                      <button
+                        onClick={onOpenTranscription}
+                        className="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-[11px] font-semibold bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white shadow-sm transition-all cursor-pointer"
+                        title="Transcribe voiceover with Gemini (Word & Sentence timestamps)"
+                      >
+                        <Mic className="w-3 h-3" />
+                        <span>Transcribe</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               );

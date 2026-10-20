@@ -161,7 +161,364 @@ export const STARTER_TEMPLATE = `<!doctype html>
   </body>
 </html>`;
 
-// Initialize sample project if DB is empty
+// Bermuda Triangle template testing starter
+export const BERMUDA_TEMPLATE = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>The Bermuda Triangle Mystery</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #020617;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+        overflow: hidden;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #020617;
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      .bg-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform-origin: center center;
+      }
+      .overlay-gradient {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(2,6,23,0.3) 0%, rgba(2,6,23,0.85) 100%);
+        pointer-events: none;
+      }
+      .letterbox-top {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: #020617;
+        z-index: 10;
+      }
+      .letterbox-bottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background: #020617;
+        z-index: 10;
+      }
+      .content-wrap {
+        position: absolute;
+        inset: 70px 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding-bottom: 60px;
+        z-index: 5;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 22px;
+        border-radius: 9999px;
+        background: rgba(15, 23, 42, 0.75);
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        color: #38bdf8;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+        backdrop-filter: blur(16px);
+        width: fit-content;
+      }
+      .pill.amber {
+        border-color: rgba(251, 191, 36, 0.4);
+        color: #fbbf24;
+      }
+      .pill.crimson {
+        border-color: rgba(244, 63, 94, 0.4);
+        color: #f43f5e;
+      }
+      .headline {
+        margin: 0;
+        font-size: 84px;
+        font-weight: 900;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      }
+      .highlight-cyan {
+        color: #38bdf8;
+        text-shadow: 0 0 30px rgba(56, 189, 248, 0.6);
+      }
+      .highlight-amber {
+        color: #fbbf24;
+        text-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
+      }
+      .highlight-rose {
+        color: #f43f5e;
+        text-shadow: 0 0 30px rgba(244, 63, 94, 0.6);
+      }
+      .subtext {
+        margin: 20px 0 0;
+        font-size: 32px;
+        color: #cbd5e1;
+        max-width: 1100px;
+        line-height: 1.45;
+        text-shadow: 0 4px 16px rgba(0,0,0,0.9);
+      }
+      .telemetry-bar {
+        margin-top: 36px;
+        display: flex;
+        align-items: center;
+        gap: 32px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 18px;
+        color: #94a3b8;
+      }
+      .telemetry-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .telemetry-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #38bdf8;
+      }
+      .compass-reticle {
+        position: absolute;
+        top: 120px;
+        right: 120px;
+        width: 160px;
+        height: 160px;
+        border: 2px dashed rgba(56, 189, 248, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+        pointer-events: none;
+      }
+      .compass-inner {
+        width: 110px;
+        height: 110px;
+        border: 1px solid rgba(56, 189, 248, 0.5);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .compass-needle {
+        width: 4px;
+        height: 60px;
+        background: linear-gradient(to top, #38bdf8 50%, #f43f5e 50%);
+        border-radius: 2px;
+      }
+      .sub-container {
+        position: absolute;
+        bottom: 80px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+        z-index: 25;
+      }
+      .sub-card {
+        position: absolute;
+        background: rgba(15, 23, 42, 0.90);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 9999px;
+        padding: 12px 34px;
+        font-size: 26px;
+        font-weight: 700;
+        color: #ffffff;
+        text-align: center;
+        max-width: 1300px;
+        box-shadow: 0 12px 36px rgba(0,0,0,0.7);
+        letter-spacing: -0.01em;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="46">
+      <!-- Voiceover Audio Track -->
+      <audio id="voiceover" src="assets/bermuda-voiceover.wav" data-start="0" data-duration="45.84" data-track-index="1" data-volume="1"></audio>
+
+      <!-- Letterbox Cinematic Bars -->
+      <div class="letterbox-top"></div>
+      <div class="letterbox-bottom"></div>
+
+      <!-- Synchronized Subtitles Track -->
+      <div class="sub-container">
+        <div id="sub-0" class="sub-card" style="opacity: 0;">The Bermuda Triangle is one of the world's most famous mysteries.</div>
+        <div id="sub-1" class="sub-card" style="opacity: 0;">Located between Florida, Bermuda, and Puerto Rico, it has been linked to stories of ships and planes mysteriously disappearing.</div>
+        <div id="sub-2" class="sub-card" style="opacity: 0;">One of the most famous cases happened in 1945, when five US Navy aircraft vanished during a training mission.</div>
+        <div id="sub-3" class="sub-card" style="opacity: 0;">But is the area actually dangerous?</div>
+        <div id="sub-4" class="sub-card" style="opacity: 0;">Scientists have found no evidence that disappearances happen here more often than in other busy parts of the ocean.</div>
+        <div id="sub-5" class="sub-card" style="opacity: 0;">Strong storms, unpredictable weather, and powerful currents may explain many of the incidents.</div>
+        <div id="sub-6" class="sub-card" style="opacity: 0;">So, there may be no supernatural mystery after all. Just a fascinating legend that refuses to disappear.</div>
+      </div>
+
+      <!-- Scene 1: Map Coordinates (0s - 14.5s) -->
+      <section id="scene-map" class="clip" data-start="0" data-duration="14.5">
+        <img id="img-map" class="bg-image" src="assets/bermuda-triangle-overlay-on-globe-map.png" alt="Bermuda Triangle Globe Map" />
+        <div class="overlay-gradient"></div>
+        <div class="compass-reticle" id="reticle-1">
+          <div class="compass-inner">
+            <div class="compass-needle" id="needle-1"></div>
+          </div>
+        </div>
+        <div class="content-wrap">
+          <div id="badge-1" class="pill">⚡ CLASSIFIED DOSSIER</div>
+          <h1 id="title-1" class="headline">THE BERMUDA <span class="highlight-cyan">TRIANGLE</span></h1>
+          <p id="sub-1" class="subtext">Between Florida, Bermuda, and Puerto Rico lies 500,000 square miles of inexplicable vanished history.</p>
+          <div id="tele-1" class="telemetry-bar">
+            <div class="telemetry-item"><span class="telemetry-dot"></span> COORD: 25.0000° N, 71.0000° W</div>
+            <div class="telemetry-item"><span class="telemetry-dot"></span> STATUS: ANOMALOUS</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 2: Flight 19 Fighters (14.5s - 26.5s) -->
+      <section id="scene-flight" class="clip" data-start="14.5" data-duration="12.0">
+        <img id="img-flight" class="bg-image" src="assets/fighter-pilots-flying-over-rough-sea-dark-cloud-on-horizon.png" alt="Fighter Pilots in Storm" />
+        <div class="overlay-gradient" style="background: radial-gradient(circle at 50% 50%, rgba(2,6,23,0.2) 0%, rgba(2,6,23,0.9) 100%);"></div>
+        <div class="content-wrap">
+          <div id="badge-2" class="pill amber">⚠️ DECEMBER 5, 1945 • FLIGHT 19</div>
+          <h1 id="title-2" class="headline">Five Navy Avengers <span class="highlight-amber">Vanished</span></h1>
+          <p id="sub-2" class="subtext">"We are entering white water... nothing seems right. We don\\'t know which way is west." Last words before radio silence.</p>
+          <div id="tele-2" class="telemetry-bar">
+            <div class="telemetry-item" style="color: #fbbf24;"><span class="telemetry-dot" style="background: #fbbf24;"></span> COMPASS: TOTAL FAILURE</div>
+            <div class="telemetry-item">WRECKAGE FOUND: ZERO</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 3: Lost Ship in the Storm (26.5s - 46s) -->
+      <section id="scene-ship" class="clip" data-start="26.5" data-duration="19.5">
+        <img id="img-ship" class="bg-image" src="assets/ship drone shot wide angle bermuda triangle in strom.png" alt="Ship in Violent Storm" />
+        <div class="overlay-gradient"></div>
+        <div class="content-wrap">
+          <div id="badge-3" class="pill crimson">🌊 THE DEVIL\\'S TRIANGLE</div>
+          <h1 id="title-3" class="headline">Swallowed by <span class="highlight-rose">The Abyss</span></h1>
+          <p id="sub-3" class="subtext">Rogue ocean waves over 100 feet tall, magnetic fissures, or secrets still locked deep below the surface?</p>
+          <div id="tele-3" class="telemetry-bar">
+            <div class="telemetry-item" style="color: #f43f5e;"><span class="telemetry-dot" style="background: #f43f5e;"></span> CASUALTIES: 1,000+ LIVES</div>
+            <div class="telemetry-item">VESSELS LOST: 50+</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // Scene 1: Map Animations (0s - 14.5s)
+      tl.fromTo("#img-map", { scale: 1.0, x: 0 }, { scale: 1.12, x: -30, duration: 14.5, ease: "none" }, 0);
+      tl.fromTo("#needle-1", { rotation: 0 }, { rotation: 720, duration: 14.5, ease: "none" }, 0);
+      tl.fromTo("#badge-1", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.5);
+      tl.fromTo("#title-1", { opacity: 0, y: 35 }, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.9);
+      tl.fromTo("#sub-1", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 1.3);
+      tl.fromTo("#tele-1", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" }, 1.8);
+      tl.to(["#badge-1", "#title-1", "#sub-1", "#tele-1", "#reticle-1"], { opacity: 0, y: -20, duration: 0.8, ease: "power2.in" }, 13.7);
+
+      // Scene 2: Flight 19 Animations (14.5s - 26.5s)
+      tl.fromTo("#img-flight", { scale: 1.0, y: 0 }, { scale: 1.14, y: -20, duration: 12.0, ease: "none" }, 14.5);
+      tl.fromTo("#badge-2", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 15.0);
+      tl.fromTo("#title-2", { opacity: 0, y: 35 }, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 15.4);
+      tl.fromTo("#sub-2", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 15.8);
+      tl.fromTo("#tele-2", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" }, 16.3);
+      tl.to(["#badge-2", "#title-2", "#sub-2", "#tele-2"], { opacity: 0, y: -20, duration: 0.8, ease: "power2.in" }, 25.7);
+
+      // Scene 3: Ship in Storm Animations (26.5s - 46s)
+      tl.fromTo("#img-ship", { scale: 1.15, x: -20 }, { scale: 1.02, x: 10, duration: 19.5, ease: "none" }, 26.5);
+      tl.fromTo("#badge-3", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 27.0);
+      tl.fromTo("#title-3", { opacity: 0, y: 35 }, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 27.4);
+      tl.fromTo("#sub-3", { opacity: 0, y: 25 }, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 27.8);
+      tl.fromTo("#tele-3", { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.out" }, 28.3);
+      tl.to(["#badge-3", "#title-3", "#sub-3", "#tele-3"], { opacity: 0, duration: 1.2, ease: "power2.in" }, 44.5);
+
+      // Synchronized Subtitle Tweens (from transcript.json)
+      tl.fromTo("#sub-0", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 0.29);
+      tl.to("#sub-0", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 5.3);
+
+      tl.fromTo("#sub-1", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 5.85);
+      tl.to("#sub-1", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 13.9);
+
+      tl.fromTo("#sub-2", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 14.12);
+      tl.to("#sub-2", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 22.2);
+
+      tl.fromTo("#sub-3", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 22.48);
+      tl.to("#sub-3", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 25.9);
+
+      tl.fromTo("#sub-4", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 26.2);
+      tl.to("#sub-4", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 32.0);
+
+      tl.fromTo("#sub-5", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 32.28);
+      tl.to("#sub-5", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 38.3);
+
+      tl.fromTo("#sub-6", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 38.56);
+      tl.to("#sub-6", { opacity: 0, y: -10, duration: 0.3, ease: "power2.in" }, 45.4);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>`;
+
+export const BERMUDA_ASSETS = [
+  'bermuda-voiceover.wav',
+  'bermuda-triangle-overlay-on-globe-map.png',
+  'fighter-pilots-flying-over-rough-sea-dark-cloud-on-horizon.png',
+  'ship drone shot wide angle bermuda triangle in strom.png',
+  'bermuda-transcript.json',
+];
+
+export function copyBermudaAssetsToProject(projectId) {
+  const assetsFolder = path.join(projectsDir, projectId, 'assets');
+  if (!fs.existsSync(assetsFolder)) {
+    fs.mkdirSync(assetsFolder, { recursive: true });
+  }
+
+  const copied = [];
+  for (const filename of BERMUDA_ASSETS) {
+    const src = path.join(rootDir, filename);
+    if (fs.existsSync(src)) {
+      const dest = path.join(assetsFolder, filename);
+      fs.copyFileSync(src, dest);
+      copied.push(filename);
+      if (filename === 'bermuda-transcript.json') {
+        fs.copyFileSync(src, path.join(assetsFolder, 'transcript.json'));
+        copied.push('transcript.json');
+      }
+    }
+  }
+  return copied;
+}
+
+// Initialize sample projects
 const existingProjects = getAllProjects();
 if (existingProjects.length === 0) {
   createProject({
@@ -171,6 +528,20 @@ if (existingProjects.length === 0) {
     width: 1920,
     height: 1080,
     duration: 6,
+  });
+}
+
+// Seed Bermuda Triangle template project if not already created
+const existingBermuda = getProject('demo-bermuda');
+if (!existingBermuda) {
+  copyBermudaAssetsToProject('demo-bermuda');
+  createProject({
+    id: 'demo-bermuda',
+    title: 'The Bermuda Triangle Mystery',
+    html: BERMUDA_TEMPLATE,
+    width: 1920,
+    height: 1080,
+    duration: 46,
   });
 }
 
@@ -189,15 +560,24 @@ app.get('/api/projects', (req, res) => {
 // Create project
 app.post('/api/projects', (req, res) => {
   try {
-    const { title, html, width, height, duration } = req.body;
+    const { title, html, width, height, duration, template, loadBermudaAssets } = req.body;
     const id = 'prj_' + crypto.randomBytes(4).toString('hex');
+    let projectHtml = html;
+    let projectDur = duration;
+
+    if (template === 'bermuda' || loadBermudaAssets) {
+      projectHtml = html || BERMUDA_TEMPLATE;
+      projectDur = duration || 46;
+      copyBermudaAssetsToProject(id);
+    }
+
     const project = createProject({
       id,
-      title: title || 'Untitled Video',
-      html: html || STARTER_TEMPLATE,
-      width,
-      height,
-      duration,
+      title: title || (template === 'bermuda' ? 'The Bermuda Triangle Mystery' : 'Untitled Video'),
+      html: projectHtml || STARTER_TEMPLATE,
+      width: width || 1920,
+      height: height || 1080,
+      duration: projectDur || 5,
     });
     res.status(201).json({ success: true, project });
   } catch (err) {
@@ -420,6 +800,405 @@ app.delete('/api/projects/:id/assets/:filename', (req, res) => {
       fs.unlinkSync(filePath);
     }
     res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Load Bermuda Triangle example assets into project
+app.post('/api/projects/:id/load-bermuda-assets', (req, res) => {
+  try {
+    const copied = copyBermudaAssetsToProject(req.params.id);
+    res.json({ success: true, count: copied.length, copied });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+function getAudioMimeType(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  switch (ext) {
+    case '.wav':
+      return 'audio/wav';
+    case '.mp3':
+      return 'audio/mp3';
+    case '.m4a':
+      return 'audio/m4a';
+    case '.ogg':
+      return 'audio/ogg';
+    case '.aac':
+      return 'audio/aac';
+    case '.flac':
+      return 'audio/flac';
+    default:
+      return 'audio/wav';
+  }
+}
+
+function normalizeTranscript(parsed, audioDuration = 0) {
+  if (!parsed || typeof parsed !== 'object') {
+    throw new Error('Invalid JSON format received from Gemini');
+  }
+
+  let sentences = Array.isArray(parsed.sentences) ? parsed.sentences : [];
+  let words = Array.isArray(parsed.words) ? parsed.words : [];
+
+  // If words array is provided but sentences is not
+  if (words.length > 0 && sentences.length === 0) {
+    let currentSentenceWords = [];
+    let sentenceIndex = 0;
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      currentSentenceWords.push(w);
+      const textStr = String(w.text || '').trim();
+      const endsWithPunct = /[.?!]$/.test(textStr);
+      const nextWord = words[i + 1];
+      const gap = nextWord ? Number(nextWord.start) - Number(w.end) : 0;
+      if (endsWithPunct || gap > 0.8 || i === words.length - 1) {
+        const sStart = Number(currentSentenceWords[0].start || 0);
+        const sEnd = Number(
+          currentSentenceWords[currentSentenceWords.length - 1].end || sStart + 1
+        );
+        sentences.push({
+          id: `s${sentenceIndex++}`,
+          text: currentSentenceWords.map((cw) => cw.text).join(' '),
+          start: Number(sStart.toFixed(2)),
+          end: Number(sEnd.toFixed(2)),
+          words: [...currentSentenceWords],
+        });
+        currentSentenceWords = [];
+      }
+    }
+  }
+
+  // If sentences is provided but words is not
+  if (sentences.length > 0 && words.length === 0) {
+    let wordIndex = 0;
+    for (const s of sentences) {
+      if (Array.isArray(s.words) && s.words.length > 0) {
+        for (const w of s.words) {
+          words.push({
+            id: w.id || `w${wordIndex++}`,
+            text: String(w.text || '').trim(),
+            start: Number(Number(w.start || 0).toFixed(2)),
+            end: Number(Number(w.end || (Number(w.start || 0) + 0.3)).toFixed(2)),
+          });
+        }
+      } else if (s.text) {
+        const tokens = String(s.text).trim().split(/\s+/);
+        const sStart = Number(s.start || 0);
+        const sEnd = Number(s.end || sStart + 1);
+        const sDur = Math.max(0.1, sEnd - sStart);
+        const perWord = sDur / tokens.length;
+        tokens.forEach((token, idx) => {
+          words.push({
+            id: `w${wordIndex++}`,
+            text: token,
+            start: Number((sStart + idx * perWord).toFixed(2)),
+            end: Number((sStart + (idx + 1) * perWord).toFixed(2)),
+          });
+        });
+      }
+    }
+  }
+
+  // Normalize IDs and numeric precision
+  words = words.map((w, idx) => ({
+    id: w.id || `w${idx}`,
+    text: String(w.text || '').trim(),
+    start: Number(Number(w.start || 0).toFixed(2)),
+    end: Number(Number(w.end || Number(w.start || 0) + 0.3).toFixed(2)),
+  }));
+
+  sentences = sentences.map((s, idx) => ({
+    id: s.id || `s${idx}`,
+    text: String(s.text || '').trim(),
+    start: Number(Number(s.start || 0).toFixed(2)),
+    end: Number(Number(s.end || 0).toFixed(2)),
+    words: Array.isArray(s.words)
+      ? s.words.map((w, wIdx) => ({
+          id: w.id || `w${idx}_${wIdx}`,
+          text: String(w.text || '').trim(),
+          start: Number(Number(w.start || 0).toFixed(2)),
+          end: Number(Number(w.end || 0).toFixed(2)),
+        }))
+      : [],
+  }));
+
+  const maxEnd = Math.max(
+    0,
+    ...words.map((w) => w.end || 0),
+    ...sentences.map((s) => s.end || 0),
+    audioDuration || 0
+  );
+
+  return {
+    duration: Number(maxEnd.toFixed(2)),
+    sentences,
+    words,
+  };
+}
+
+// Transcribe audio using Gemini API
+app.post('/api/projects/:id/transcribe', async (req, res) => {
+  try {
+    const { filename, apiKey, model } = req.body;
+    if (!apiKey || !apiKey.trim()) {
+      return res.status(400).json({ success: false, error: 'Gemini API key is required' });
+    }
+
+    const projectId = req.params.id;
+    let audioFilePath = '';
+
+    // Search in project assets
+    if (filename) {
+      const candidate1 = path.join(projectsDir, projectId, 'assets', path.basename(filename));
+      const candidate2 = path.join(rootDir, path.basename(filename));
+      if (fs.existsSync(candidate1)) {
+        audioFilePath = candidate1;
+      } else if (fs.existsSync(candidate2)) {
+        audioFilePath = candidate2;
+      }
+    }
+
+    if (!audioFilePath) {
+      // Look for any audio file in projects/:id/assets/
+      const assetsFolder = path.join(projectsDir, projectId, 'assets');
+      if (fs.existsSync(assetsFolder)) {
+        const files = fs.readdirSync(assetsFolder);
+        const found = files.find((f) =>
+          ['.wav', '.mp3', '.m4a', '.ogg', '.aac', '.flac'].includes(
+            path.extname(f).toLowerCase()
+          )
+        );
+        if (found) audioFilePath = path.join(assetsFolder, found);
+      }
+    }
+
+    if (!audioFilePath) {
+      // Check root for bermuda-voiceover.wav
+      const rootWav = path.join(rootDir, 'bermuda-voiceover.wav');
+      if (fs.existsSync(rootWav)) {
+        audioFilePath = rootWav;
+      }
+    }
+
+    if (!audioFilePath || !fs.existsSync(audioFilePath)) {
+      return res.status(404).json({
+        success: false,
+        error: `Audio file "${filename || 'voiceover'}" not found in project assets or workspace.`,
+      });
+    }
+
+    const stats = fs.statSync(audioFilePath);
+    const maxBytes = 25 * 1024 * 1024; // 25 MB
+    if (stats.size > maxBytes) {
+      return res.status(400).json({
+        success: false,
+        error: `Audio file is too large (${(stats.size / 1024 / 1024).toFixed(1)}MB). Max supported size is 25MB.`,
+      });
+    }
+
+    const mimeType = getAudioMimeType(audioFilePath);
+    const audioBuffer = fs.readFileSync(audioFilePath);
+    const base64Audio = audioBuffer.toString('base64');
+
+    const targetModel = (model && model.trim()) || 'gemini-3.5-transcribe';
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(targetModel)}:generateContent?key=${encodeURIComponent(apiKey.trim())}`;
+
+    const promptText = `You are a professional audio transcription engine. Carefully transcribe all speech in this audio with millisecond-precision timestamps in seconds.
+Return STRICT JSON adhering to this exact format:
+{
+  "duration": <total audio duration in seconds as float>,
+  "sentences": [
+    {
+      "id": "s0",
+      "text": "<full sentence or phrase text>",
+      "start": 0.00,
+      "end": 4.20,
+      "words": [
+        { "id": "w0", "text": "First", "start": 0.00, "end": 0.45 },
+        { "id": "w1", "text": "word", "start": 0.48, "end": 0.90 }
+      ]
+    }
+  ],
+  "words": [
+    { "id": "w0", "text": "First", "start": 0.00, "end": 0.45 },
+    { "id": "w1", "text": "word", "start": 0.48, "end": 0.90 }
+  ]
+}
+
+Strict requirements:
+1. Every word must have a unique sequential id ("w0", "w1", ...), exact text, start time in seconds (float), and end time in seconds (float).
+2. Every sentence must have a unique sequential id ("s0", "s1", ...), complete sentence text, start time in seconds, end time in seconds, and its nested words list.
+3. The root "words" array must contain all words in sequential order matching the canonical HyperFrames format.
+4. Timestamps must be non-decreasing, accurate to the spoken audio, and cover all spoken dialogue.`;
+
+function extractJsonFromText(rawText) {
+  if (!rawText) return null;
+  const cleaned = rawText.replace(/```(?:json)?\s*([\s\S]*?)\s*```/gi, '$1').trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch (_) {}
+
+  const firstBrace = rawText.indexOf('{');
+  const lastBrace = rawText.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    try {
+      return JSON.parse(rawText.slice(firstBrace, lastBrace + 1));
+    } catch (_) {}
+  }
+
+  const firstBracket = rawText.indexOf('[');
+  const lastBracket = rawText.lastIndexOf(']');
+  if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
+    try {
+      return JSON.parse(rawText.slice(firstBracket, lastBracket + 1));
+    } catch (_) {}
+  }
+
+  return null;
+}
+
+    // Build payload without forcing responseMimeType in generationConfig
+    // This allows gemini-3.5-transcribe and all model variants to work without "JSON mode is not enabled" error.
+    const requestBody = {
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              inline_data: {
+                mime_type: mimeType,
+                data: base64Audio,
+              },
+            },
+            {
+              text: promptText,
+            },
+          ],
+        },
+      ],
+    };
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000); // 120s timeout
+
+    let geminiRes;
+    try {
+      geminiRes = await fetch(geminiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
+      });
+    } catch (fetchErr) {
+      clearTimeout(timeout);
+      return res.status(500).json({
+        success: false,
+        error: `Failed to connect to Gemini API: ${fetchErr.message}`,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    if (!geminiRes.ok) {
+      const errorJson = await geminiRes.json().catch(() => null);
+      const errorMsg =
+        errorJson?.error?.message ||
+        `Gemini API returned status ${geminiRes.status} (${geminiRes.statusText})`;
+      return res.status(geminiRes.status).json({
+        success: false,
+        error: errorMsg,
+        details: errorJson?.error,
+        modelUsed: targetModel,
+      });
+    }
+
+    const data = await geminiRes.json();
+    const candidate = data.candidates?.[0];
+    const rawText = candidate?.content?.parts?.[0]?.text;
+
+    if (!rawText) {
+      return res.status(500).json({
+        success: false,
+        error: 'Gemini returned an empty response or blocked content.',
+        data,
+      });
+    }
+
+    const parsed = extractJsonFromText(rawText);
+    if (!parsed) {
+      return res.status(500).json({
+        success: false,
+        error: `Could not parse valid JSON from Gemini transcription response.`,
+        rawText,
+      });
+    }
+
+    const normalized = normalizeTranscript(parsed);
+
+    // Save automatically to projects/:id/assets/transcript.json
+    const assetsFolder = path.join(projectsDir, projectId, 'assets');
+    if (!fs.existsSync(assetsFolder)) {
+      fs.mkdirSync(assetsFolder, { recursive: true });
+    }
+    const transcriptPath = path.join(assetsFolder, 'transcript.json');
+    fs.writeFileSync(transcriptPath, JSON.stringify(normalized, null, 2), 'utf8');
+
+    res.json({
+      success: true,
+      transcript: normalized,
+      savedPath: 'assets/transcript.json',
+      modelUsed: targetModel,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Save or update transcript manually
+app.post('/api/projects/:id/save-transcript', (req, res) => {
+  try {
+    const { transcript } = req.body;
+    if (!transcript) {
+      return res.status(400).json({ success: false, error: 'Transcript data is required' });
+    }
+    const assetsFolder = path.join(projectsDir, req.params.id, 'assets');
+    if (!fs.existsSync(assetsFolder)) {
+      fs.mkdirSync(assetsFolder, { recursive: true });
+    }
+    const filePath = path.join(assetsFolder, 'transcript.json');
+    let content;
+    if (typeof transcript === 'string') {
+      try {
+        const obj = JSON.parse(transcript);
+        content = JSON.stringify(normalizeTranscript(obj), null, 2);
+      } catch {
+        content = transcript;
+      }
+    } else {
+      content = JSON.stringify(normalizeTranscript(transcript), null, 2);
+    }
+    fs.writeFileSync(filePath, content, 'utf8');
+    res.json({ success: true, savedPath: 'assets/transcript.json' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Get existing transcript for project if present
+app.get('/api/projects/:id/transcript', (req, res) => {
+  try {
+    const filePath = path.join(projectsDir, req.params.id, 'assets', 'transcript.json');
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      const data = JSON.parse(content);
+      return res.json({ success: true, transcript: data, exists: true });
+    }
+    res.json({ success: true, transcript: null, exists: false });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

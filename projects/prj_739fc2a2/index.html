@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Attention: The Transformer Explained</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { box-sizing: border-box; }
+
+      :root {
+        --ink: #111316;
+        --bone: #ece6d8;
+        --muted: #8b8f98;
+        --signal: #ff6a2b;
+        --rule: #2a2e36;
+        --serif: Georgia, "Times New Roman", serif;
+        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      }
+
+      body {
+        margin: 0;
+        background: var(--ink);
+        color: var(--bone);
+        font-family: var(--sans);
+        overflow: hidden;
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--ink);
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 160px;
+      }
+
+      .display {
+        font-family: var(--serif);
+        font-size: 104px;
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+        font-weight: 400;
+        margin: 0;
+        max-width: 1500px;
+      }
+
+      .body {
+        font-size: 52px;
+        line-height: 1.3;
+        margin: 0;
+        max-width: 1500px;
+      }
+
+      .muted { color: var(--muted); }
+
+      .rule {
+        height: 1px;
+        width: 900px;
+        background: var(--rule);
+      }
+
+      .row {
+        width: 1200px;
+        border-top: 1px solid var(--rule);
+        padding: 26px 0;
+        font-family: var(--serif);
+        font-size: 76px;
+        line-height: 1.15;
+      }
+      .row:last-child { border-bottom: 1px solid var(--rule); }
+
+      .word {
+        position: absolute;
+        top: 520px;
+        width: 180px;
+        text-align: center;
+        font-family: var(--serif);
+        font-size: 56px;
+        color: var(--bone);
+        white-space: nowrap;
+      }
+      .word.hl { color: var(--signal); }
+
+      #s4svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="36">
+
+      <!-- Scene 1: The hook (0s – 6s) -->
+      <section id="s1" class="clip" data-start="0" data-duration="6">
+        <div id="l1" class="display">What if a machine could understand</div>
+        <div id="l2" class="display">the relationship between every word</div>
+        <div id="l3" class="display">in a sentence, no matter how far apart they are?</div>
+      </section>
+
+      <!-- Scene 2: The idea (6s – 9s) -->
+      <section id="s2" class="clip" data-start="6" data-duration="3">
+        <div id="t1" class="body muted">That’s the idea behind</div>
+        <div id="t2" class="display" style="font-size: 220px;">Transformers.</div>
+      </section>
+
+      <!-- Scene 3: 2017 and attention (9s – 15s) -->
+      <section id="s3" class="clip" data-start="9" data-duration="6">
+        <div id="yr" class="display" style="font-size: 260px;">2000</div>
+        <div id="yrrule" class="rule" style="margin: 36px 0 32px 0; transform-origin: left center;"></div>
+        <div id="yrlbl" class="body muted">Transformer architecture introduced</div>
+        <div id="s3a" class="body" style="margin-top: 24px;">changed AI by using a mechanism called attention.</div>
+      </section>
+
+      <!-- Scene 4: Attention diagram (15s – 23s) -->
+      <section id="s4" class="clip" data-start="15" data-duration="8">
+        <svg id="s4svg" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+          <path id="arc2" d="M1410 500 Q1230 180 1050 500" fill="none" stroke="#8b8f98" stroke-width="3"
+                pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" />
+          <path id="arc1" d="M1410 500 Q870 -100 330 500" fill="none" stroke="#ff6a2b" stroke-width="7"
+                stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" />
+        </svg>
+
+        <div id="lbl1" style="position:absolute; left:670px; width:400px; top:130px; text-align:center;
+             font-family: var(--serif); font-style: italic; font-size: 36px; color: #ff6a2b; opacity: 1;">
+          it → animal
+        </div>
+
+        <div class="word" style="left: 60px;">The</div>
+        <div class="word hl" style="left: 240px;">animal</div>
+        <div class="word" style="left: 420px;">didn’t</div>
+        <div class="word" style="left: 600px;">cross</div>
+        <div class="word" style="left: 780px;">the</div>
+        <div class="word" style="left: 960px;">street</div>
+        <div class="word" style="left: 1140px;">because</div>
+        <div class="word hl" style="left: 1320px;">it</div>
+        <div class="word" style="left: 1500px;">was</div>
+        <div class="word" style="left: 1680px;">tired</div>
+
+        <div id="cap" class="body muted" style="position:absolute; left:160px; top:820px; width:1600px; font-size: 40px;">
+          It looks at many parts at once and figures out which ones matter most.
+        </div>
+      </section>
+
+      <!-- Scene 5: Where it shows up (23s – 29s) -->
+      <section id="s5" class="clip" data-start="23" data-duration="6">
+        <div id="s5h" class="body muted" style="margin-bottom: 56px;">The foundation of modern AI</div>
+        <div class="row">ChatGPT</div>
+        <div class="row">Translation tools</div>
+        <div class="row">Image generators</div>
+        <div class="row">Coding assistants</div>
+      </section>
+
+      <!-- Scene 6: The question (29s – 32s) -->
+      <section id="s6" class="clip" data-start="29" data-duration="3">
+        <div id="s6t" class="display" style="font-size: 96px;">But how did this architecture become so powerful?</div>
+      </section>
+
+      <!-- Scene 7: The paper (32s – 36s) -->
+      <section id="s7" class="clip" data-start="32" data-duration="4">
+        <div id="s7a" class="body muted">Let’s start with the breakthrough that changed AI forever:</div>
+        <div id="s7b" class="display" style="font-size: 124px; margin-top: 40px;">“Attention Is All You Need.”</div>
+        <div id="s7u" style="height: 6px; width: 1100px; background: #ff6a2b; margin-top: 28px; transform-origin: left center;"></div>
+      </section>
+
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const yr = document.getElementById("yr");
+      const counter = { v: 2000 };
+
+      // Scene 1 (0s – 6s)
+      tl.fromTo("#l1", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.3);
+      tl.fromTo("#l2", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 1.3);
+      tl.fromTo("#l3", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 2.3);
+      tl.to(["#l1", "#l2", "#l3"], { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" }, 5.6);
+
+      // Scene 2 (6s – 9s)
+      tl.fromTo("#t1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 6.2);
+      tl.fromTo("#t2", { opacity: 0, y: 40, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power3.out" }, 6.7);
+      tl.to(["#t1", "#t2"], { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" }, 8.6);
+
+      // Scene 3 (9s – 15s)
+      tl.fromTo("#yr", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 9.2);
+      tl.to(counter, {
+        v: 2017,
+        duration: 1.3,
+        ease: "power2.out",
+        onUpdate: () => { yr.textContent = Math.round(counter.v); }
+      }, 9.4);
+      tl.fromTo("#yrrule", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "power3.inOut" }, 10.6);
+      tl.fromTo("#yrlbl", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 10.9);
+      tl.fromTo("#s3a", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 11.8);
+      tl.to(["#yr", "#yrrule", "#yrlbl", "#s3a"], { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" }, 14.6);
+
+      // Scene 4 (15s – 23s): the attention diagram
+      tl.fromTo(".word", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", stagger: 0.08 }, 15.4);
+      tl.fromTo("#arc1", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut" }, 16.8);
+      tl.fromTo("#lbl1", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 17.8);
+      tl.fromTo("#arc2", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.0, ease: "power2.inOut" }, 18.3);
+      tl.fromTo("#cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 19.5);
+      tl.to([".word", "#arc1", "#arc2", "#lbl1", "#cap"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 22.6);
+
+      // Scene 5 (23s – 29s)
+      tl.fromTo("#s5h", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 23.2);
+      tl.fromTo(".row", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.6, ease: "power3.out", stagger: 0.18 }, 23.6);
+      tl.to(["#s5h", ".row"], { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" }, 28.6);
+
+      // Scene 6 (29s – 32s)
+      tl.fromTo("#s6t", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.9, ease: "power3.out" }, 29.2);
+      tl.to("#s6t", { opacity: 0, y: -30, duration: 0.4, ease: "power2.in" }, 31.6);
+
+      // Scene 7 (32s – 36s)
+      tl.fromTo("#s7a", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 32.2);
+      tl.fromTo("#s7b", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.9, ease: "power4.out" }, 32.9);
+      tl.fromTo("#s7u", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.inOut" }, 33.8);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

@@ -167,6 +167,7 @@ export default function App() {
       <PromptHelper
         isOpen={isPromptHelperOpen}
         onClose={() => setIsPromptHelperOpen(false)}
+        project={activeProject}
       />
 
       <RenderModal

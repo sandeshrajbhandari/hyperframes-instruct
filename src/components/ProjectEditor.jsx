@@ -13,9 +13,11 @@ import {
   Check,
   ShieldAlert,
   FolderOpen,
+  Mic,
 } from 'lucide-react';
 import VideoPlayer from './VideoPlayer.jsx';
 import AssetManager from './AssetManager.jsx';
+import TranscriptionView from './TranscriptionView.jsx';
 
 export default function ProjectEditor({
   project,
@@ -227,7 +229,25 @@ export default function ProjectEditor({
               <FolderOpen className="w-3.5 h-3.5" />
               Assets (Images & VO)
             </button>
+            <button
+              onClick={() => setViewMode('transcription')}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded font-medium transition-colors ${
+                viewMode === 'transcription' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Mic className="w-3.5 h-3.5" />
+              Transcription
+            </button>
           </div>
+
+          <button
+            onClick={onOpenPromptHelper}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-indigo-600/30 to-cyan-600/30 hover:from-indigo-600/40 hover:to-cyan-600/40 text-indigo-200 border border-indigo-500/40 shadow-sm transition-all cursor-pointer"
+            title="Generate a ready-to-run prompt with project assets and transcript for Claude / ChatGPT"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Prompt Creator</span>
+          </button>
 
           <button
             onClick={handlePasteClipboard}
@@ -274,12 +294,29 @@ export default function ProjectEditor({
         {/* Asset Manager Pane */}
         {viewMode === 'assets' && (
           <div className="flex-1 bg-slate-900/90 rounded-2xl border border-slate-800/80 overflow-hidden shadow-xl">
-            <AssetManager projectId={project.id} projectTitle={title} />
+            <AssetManager
+              projectId={project.id}
+              projectTitle={title}
+              onOpenTranscription={() => setViewMode('transcription')}
+              onOpenPromptHelper={onOpenPromptHelper}
+            />
+          </div>
+        )}
+
+        {/* Transcription Studio Pane */}
+        {viewMode === 'transcription' && (
+          <div className="flex-1 bg-slate-900/90 rounded-2xl border border-slate-800/80 overflow-hidden shadow-xl">
+            <TranscriptionView
+              projectId={project.id}
+              projectTitle={title}
+              onSwitchToCode={() => setViewMode('split')}
+              onOpenPromptHelper={onOpenPromptHelper}
+            />
           </div>
         )}
 
         {/* Code Editor Pane */}
-        {viewMode !== 'assets' && (viewMode === 'code' || viewMode === 'split') && (
+        {viewMode !== 'assets' && viewMode !== 'transcription' && (viewMode === 'code' || viewMode === 'split') && (
           <div
             className={`flex flex-col bg-slate-900/90 rounded-2xl border border-slate-800/80 overflow-hidden shadow-xl transition-all ${
               viewMode === 'split' ? 'w-1/2' : 'w-full'

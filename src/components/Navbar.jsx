@@ -65,7 +65,7 @@ export default function Navbar({
             className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium text-slate-300 hover:text-indigo-400 hover:bg-slate-800/50 transition-all"
           >
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-            Prompt Helper
+            Prompt Creator
           </button>
         </nav>
       </div>

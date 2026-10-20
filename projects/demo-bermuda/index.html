@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Bermuda Triangle Mystery — Hand-Drawn Documentary</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #f3ead6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  background: #f3ead6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+}
+
+.clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+#scene-1 {
+  z-index: 1;
+}
+
+#scene-2 {
+  z-index: 2;
+}
+
+#scene-3 {
+  z-index: 3;
+}
+
+.paper {
+  position: absolute;
+  inset: 0;
+  background: #f3ead6;
+}
+
+#paper-2,
+#paper-3 {
+  opacity: 0;
+}
+
+.art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: url(#wobble);
+  z-index: 1;
+}
+
+.text-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  filter: url(#wobble);
+  color: #2b2623;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 1.12;
+}
+
+.pop,
+.word-pop {
+  opacity: 0;
+}
+
+.w {
+  display: inline-block;
+  transform-origin: 50% 60%;
+}
+
+.marker {
+  text-shadow: 4px 4px 0 rgba(214,73,51,0.35);
+  letter-spacing: -1px;
+}
+
+.kicker {
+  font-size: 23px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  line-height: 1.2;
+}
+
+.display {
+  font-size: 82px;
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -3px;
+}
+
+.headline {
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 1.02;
+  letter-spacing: -2px;
+}
+
+.subhead {
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -1px;
+}
+
+.small-label {
+  font-size: 25px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.red {
+  color: #d64933;
+}
+
+.blue {
+  color: #2f6f9f;
+}
+
+.mustard {
+  color: #f2b940;
+}
+
+.charcoal {
+  color: #2b2623;
+}
+
+.stat {
+  color: #f2b940;
+  -webkit-text-stroke: 2px #2b2623;
+  paint-order: stroke fill;
+  font-size: 64px;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.stat-caption {
+  width: 560px;
+  font-size: 29px;
+  line-height: 1.2;
+}
+
+.question-mark {
+  font-size: 128px;
+  line-height: 1;
+}
+
+#fade {
+  position: absolute;
+  inset: 0;
+  background: #2b2623;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.sub-container {
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.sub-card {
+  opacity: 0;
+  position: absolute;
+  max-width: 1200px;
+  padding: 12px 32px;
+  background: rgba(15,23,42,0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 9999px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+svg path {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+}
+
+.draw.static {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  opacity: 1;
+}
+
+.grain {
+  pointer-events: none;
+}
+
+.plane-symbol {
+  stroke: #2b2623;
+  stroke-width: 7;
+  fill: none;
+}
+
+.chart-label {
+  font-size: 25px;
+  text-align: center;
+  line-height: 1.12;
+}
+
+.culprit-label {
+  width: 370px;
+  text-align: center;
+  font-size: 27px;
+  line-height: 1.12;
+}
+
+.endline {
+  font-size: 49px;
+  line-height: 1.12;
+  width: 900px;
+  letter-spacing: -1.5px;
+}
+
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="46">
+
+  <audio id="voiceover" src="assets/bermuda-voiceover.wav" data-start="0" data-duration="45.41" data-track-index="1" data-volume="1"></audio>
+
+  <svg width="0" height="0" style="position:absolute; overflow:visible" aria-hidden="true">
+    <defs>
+      <filter id="wobble">
+        <feTurbulence id="turb" type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="1" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="5"/>
+      </filter>
+
+      <symbol id="plane" viewBox="-65 -48 125 96">
+        <path class="draw static" pathLength="1" d="M-50 2 L-34 -2 L-10 -3 L13 -2 L48 0 L54 4 L14 7 L-28 5 L-49 7 Z" fill="none"/>
+        <path class="draw static" pathLength="1" d="M-10 1 L-30 -40 L-24 -42 L8 -1" fill="none"/>
+        <path class="draw static" pathLength="1" d="M-10 3 L-30 39 L-24 41 L8 4" fill="none"/>
+        <path class="draw static" pathLength="1" d="M-39 3 L-53 -15 L-48 -17 L-27 1" fill="none"/>
+        <path class="draw static" pathLength="1" d="M-39 4 L-53 18 L-48 19 L-27 4" fill="none"/>
+      </symbol>
+
+      <clipPath id="triangle-map-clip">
+        <path class="draw static" pathLength="1" d="M560 640 L1340 300 L1400 800 Z" fill="#f3ead6" stroke="none"/>
+      </clipPath>
+    </defs>
+  </svg>
+
+  <!-- SCENE 1: COORDINATES -->
+  <section id="scene-1" class="clip" data-start="0" data-duration="14.5">
+    <div class="paper" id="paper-1"></div>
+
+    <svg id="art-1" class="art" viewBox="0 0 1920 1080" style="position:absolute; inset:0; width:100%; height:100%;" aria-hidden="true">
+      <defs>
+        <filter id="grain-filter-1">
+          <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="2" seed="4"/>
+        </filter>
+      </defs>
+
+      <rect id="grain-1" class="grain" x="0" y="0" width="1920" height="1080" fill="#f3ead6" opacity="0.08" filter="url(#grain-filter-1)"/>
+
+      <!-- Shot 1.1: the title triangle -->
+      <g id="title-triangle-art">
+        <path id="tri-title-a" class="draw" pathLength="1" d="M1403 218 L1390 245 L1369 275 L1352 306 L1329 340 L1309 370 L1286 405 L1266 438 L1247 474 L1222 510 L1201 544 L1180 579 L1159 615 L1134 648 L1114 682 L1090 717 L1072 749 L1058 777" fill="none" stroke="#d64933" stroke-width="8"/>
+        <path id="tri-title-b" class="draw" pathLength="1" d="M1058 777 L1110 783 L1163 779 L1218 785 L1272 780 L1328 784 L1380 780 L1433 785 L1488 780 L1540 784 L1596 779 L1646 783 L1705 780 L1752 781" fill="none" stroke="#d64933" stroke-width="8"/>
+        <path id="tri-title-c" class="draw" pathLength="1" d="M1752 781 L1731 748 L1712 711 L1687 679 L1666 642 L1644 611 L1621 575 L1603 542 L1582 506 L1560 473 L1537 440 L1519 403 L1497 369 L1477 336 L1456 304 L1437 271 L1420 242 L1403 218" fill="none" stroke="#d64933" stroke-width="8"/>
+        <path id="sea-title" class="draw" pathLength="1" d="M907 835 Q940 816 971 834 T1037 831 T1105 832 T1173 831 T1241 832 T1309 830 T1377 833 T1446 830 T1517 835 T1587 830 T1660 834 T1735 831 T1825 833" fill="none" stroke="#2f6f9f" stroke-width="7"/>
+      </g>
+
+      <!-- Shot 1.2: map outlines -->
+      <g id="map-land-art">
+        <path id="florida-draw" class="draw" pathLength="1" d="M522 431 L545 426 L563 444 L580 474 L588 503 L605 529 L609 557 L622 578 L621 598 L635 623 L629 641 L618 628 L605 603 L589 578 L577 552 L562 525 L550 492 L536 465 L519 448 Z" fill="none" stroke="#2b2623" stroke-width="7"/>
+        <path id="bermuda-draw" class="draw" pathLength="1" d="M1312 301 Q1320 288 1334 294 Q1349 288 1359 300 Q1364 312 1351 318 Q1337 323 1327 314 Q1313 317 1312 301 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+        <path id="puerto-draw" class="draw" pathLength="1" d="M1351 798 Q1367 789 1387 795 L1411 793 L1423 800 L1406 811 L1385 809 L1367 814 L1351 807 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+        <g id="map-waves">
+          <path id="map-wave-a" class="draw" pathLength="1" d="M743 363 Q764 349 788 363 T832 361 T875 361" fill="none" stroke="#2f6f9f" stroke-width="6"/>
+          <path id="map-wave-b" class="draw" pathLength="1" d="M776 402 Q797 389 817 402 T861 400 T904 401" fill="none" stroke="#2f6f9f" stroke-width="6"/>
+          <path id="map-wave-c" class="draw" pathLength="1" d="M1080 690 Q1102 676 1123 691 T1168 689 T1211 691" fill="none" stroke="#2f6f9f" stroke-width="6"/>
+          <path id="map-wave-d" class="draw" pathLength="1" d="M1102 726 Q1122 712 1143 727 T1187 725 T1230 726" fill="none" stroke="#2f6f9f" stroke-width="6"/>
+        </g>
+      </g>
+
+      <!-- Dots and dashed route segments persist into Shot 1.3 -->
+      <g id="map-overlay-art">
+        <g id="dot-florida" class="pop">
+          <path class="draw static" pathLength="1" d="M548 640 Q552 627 565 631 Q578 633 575 646 Q572 658 559 656 Q545 654 548 640 Z" fill="#d64933" stroke="#d64933" stroke-width="4"/>
+        </g>
+        <g id="dot-bermuda" class="pop">
+          <path class="draw static" pathLength="1" d="M1325 300 Q1329 288 1342 292 Q1353 296 1348 308 Q1345 320 1334 316 Q1321 313 1325 300 Z" fill="#d64933" stroke="#d64933" stroke-width="4"/>
+        </g>
+        <g id="dot-puerto" class="pop">
+          <path class="draw static" pathLength="1" d="M1376 800 Q1380 788 1393 793 Q1406 796 1400 809 Q1395 819 1384 814 Q1372 812 1376 800 Z" fill="#d64933" stroke="#d64933" stroke-width="4"/>
+        </g>
+
+        <g id="map-connectors">
+          <path id="map-line-a" class="draw" pathLength="1" d="M588 624 L616 609 M646 596 L674 580 M704 567 L732 551 M762 537 L790 522 M820 508 L848 493 M878 480 L906 465 M936 452 L964 437 M994 423 L1022 408 M1052 394 L1080 379 M1110 365 L1138 350 M1168 336 L1196 321 M1226 307 L1254 292 M1284 286 L1317 296" fill="none" stroke="#d64933" stroke-width="6"/>
+          <path id="map-line-b" class="draw" pathLength="1" d="M1350 329 L1355 362 M1360 395 L1364 429 M1368 462 L1372 495 M1376 528 L1380 561 M1384 594 L1388 627 M1392 660 L1396 693 M1399 726 L1401 758 M1400 781 L1394 793" fill="none" stroke="#d64933" stroke-width="6"/>
+          <path id="map-line-c" class="draw" pathLength="1" d="M1366 800 L1335 789 M1304 778 L1273 767 M1242 756 L1211 745 M1180 734 L1149 723 M1118 712 L1087 701 M1056 690 L1025 679 M994 668 L963 657 M932 646 L901 635 M870 624 L839 613 M808 602 L777 591 M746 580 L715 569 M684 558 L653 547 M622 536 L591 525" fill="none" stroke="#d64933" stroke-width="6"/>
+        </g>
+
+        <!-- Shot 1.3: triangle hatching clipped to the mapped area -->
+        <g id="triangle-hatching" clip-path="url(#triangle-map-clip)">
+          <path id="hatch-1" class="draw" pathLength="1" d="M530 760 L850 390" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="hatch-2" class="draw" pathLength="1" d="M610 805 L930 435" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="hatch-3" class="draw" pathLength="1" d="M690 835 L1010 465" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="hatch-4" class="draw" pathLength="1" d="M770 845 L1090 475" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="hatch-5" class="draw" pathLength="1" d="M850 850 L1170 480" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="hatch-6" class="draw" pathLength="1" d="M930 855 L1250 485" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="hatch-7" class="draw" pathLength="1" d="M1010 858 L1330 488" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="hatch-8" class="draw" pathLength="1" d="M1090 860 L1410 490" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="hatch-9" class="draw" pathLength="1" d="M1170 860 L1490 490" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="hatch-10" class="draw" pathLength="1" d="M1250 860 L1570 490" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+        </g>
+
+        <!-- Three ship doodles -->
+        <g id="ship-1" class="pop" transform="translate(790 550)">
+          <path class="draw static" pathLength="1" d="M-42 2 L-30 19 L27 19 L42 1 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+          <path class="draw static" pathLength="1" d="M-4 1 L-4 -43 L-3 0 M-2 -39 L20 -24 L-2 -22 Z" fill="none" stroke="#2b2623" stroke-width="5"/>
+          <path class="draw static" pathLength="1" d="M-45 29 Q-24 20 -3 29 T38 28" fill="none" stroke="#2f6f9f" stroke-width="4"/>
+        </g>
+        <g id="ship-2" class="pop" transform="translate(963 493)">
+          <path class="draw static" pathLength="1" d="M-40 2 L-29 18 L25 18 L40 1 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+          <path class="draw static" pathLength="1" d="M-3 1 L-3 -38 L-2 0 M0 -35 L19 -23 L0 -20 Z" fill="none" stroke="#2b2623" stroke-width="5"/>
+          <path class="draw static" pathLength="1" d="M-41 27 Q-21 18 -1 27 T37 27" fill="none" stroke="#2f6f9f" stroke-width="4"/>
+        </g>
+        <g id="ship-3" class="pop" transform="translate(1108 468)">
+          <path class="draw static" pathLength="1" d="M-38 1 L-25 17 L27 17 L38 1 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+          <path class="draw static" pathLength="1" d="M-4 0 L-4 -34 L-3 0 M-1 -31 L17 -19 L-1 -18 Z" fill="none" stroke="#2b2623" stroke-width="5"/>
+          <path class="draw static" pathLength="1" d="M-39 25 Q-19 16 1 25 T36 25" fill="none" stroke="#2f6f9f" stroke-width="4"/>
+        </g>
+
+        <g id="ship-x-1">
+          <path id="ship-x-a" class="draw" pathLength="1" d="M769 530 L785 546 M785 530 L769 546" fill="none" stroke="#d64933" stroke-width="6"/>
+        </g>
+        <g id="ship-x-2">
+          <path id="ship-x-b" class="draw" pathLength="1" d="M941 473 L957 489 M957 473 L941 489" fill="none" stroke="#d64933" stroke-width="6"/>
+        </g>
+        <g id="ship-x-3">
+          <path id="ship-x-c" class="draw" pathLength="1" d="M1088 449 L1104 465 M1104 449 L1088 465" fill="none" stroke="#d64933" stroke-width="6"/>
+        </g>
+
+        <!-- Two tiny planes -->
+        <g id="map-plane-1" class="pop" transform="translate(1195 540) scale(0.34)">
+          <use href="#plane" width="125" height="96" x="-62" y="-48"/>
+        </g>
+        <g id="map-plane-2" class="pop" transform="translate(1260 650) scale(0.30)">
+          <use href="#plane" width="125" height="96" x="-62" y="-48"/>
+        </g>
+        <path id="plane-x-a" class="draw" pathLength="1" d="M1185 528 L1201 544 M1201 528 L1185 544" fill="none" stroke="#d64933" stroke-width="6"/>
+        <path id="plane-x-b" class="draw" pathLength="1" d="M1250 639 L1266 655 M1266 639 L1250 655" fill="none" stroke="#d64933" stroke-width="6"/>
+      </g>
+    </svg>
+
+    <!-- Shot 1.1 title lettering -->
+    <div id="texts1-title" class="text-layer">
+      <div id="case-kicker" class="pop marker kicker" style="position:absolute; left:120px; top:125px;">
+        <span class="w">CASE</span> <span class="w">FILE</span> <span class="w">/</span> <span class="w">NORTH</span> <span class="w">ATLANTIC</span>
+      </div>
+      <div id="title-bermuda" class="pop marker display" style="position:absolute; left:115px; top:240px; width:760px;">
+        <span class="w">THE</span> <span class="w">BERMUDA</span>
+      </div>
+      <div id="title-triangle" class="pop marker display red" style="position:absolute; left:115px; top:340px; width:720px; font-size:105px;">
+        <span class="w">TRIANGLE</span>
+      </div>
+      <div id="title-tagline" class="pop marker subhead blue" style="position:absolute; left:120px; top:650px; width:670px;">
+        <span class="w">AN</span> <span class="w">UNSOLVED</span><br>
+        <span class="w">MYSTERY?</span>
+      </div>
+      <div id="title-question" class="pop marker question-mark mustard" style="position:absolute; left:1355px; top:425px;">
+        <span class="w">?</span>
+      </div>
+    </div>
+
+    <!-- Shot 1.2 coordinates -->
+    <div id="texts1-map" class="text-layer">
+      <div id="map-kicker" class="pop marker kicker" style="position:absolute; left:120px; top:115px;">
+        <span class="w">THE</span> <span class="w">COORDINATES</span>
+      </div>
+      <div id="map-label-florida" class="pop marker small-label" style="position:absolute; left:325px; top:510px;">
+        <span class="w">FLORIDA</span>
+      </div>
+      <div id="map-label-bermuda" class="pop marker small-label red" style="position:absolute; left:1320px; top:235px;">
+        <span class="w">BERMUDA</span>
+      </div>
+      <div id="map-label-puerto" class="pop marker small-label" style="position:absolute; left:1325px; top:835px;">
+        <span class="w">PUERTO</span> <span class="w">RICO</span>
+      </div>
+    </div>
+
+    <!-- Shot 1.3 statistic -->
+    <div id="texts1-number" class="text-layer">
+      <div id="stat-area" class="pop marker stat" style="position:absolute; left:105px; top:490px; width:650px;">
+        <span class="w">500,000</span><br>
+        <span class="w">SQ</span> <span class="w">MILES</span>
+      </div>
+      <div id="stat-caption" class="pop marker stat-caption" style="position:absolute; left:120px; top:640px;">
+        <span class="w">OF</span> <span class="w">OCEAN</span> <span class="w">WHERE</span><br>
+        <span class="w">SHIPS</span> <span class="w">AND</span> <span class="w">PLANES</span><br>
+        <span class="w">VANISHED</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 2: FLIGHT 19 -->
+  <section id="scene-2" class="clip" data-start="14.5" data-duration="12">
+    <div class="paper" id="paper-2"></div>
+
+    <svg id="art-2" class="art" viewBox="0 0 1920 1080" style="position:absolute; inset:0; width:100%; height:100%;" aria-hidden="true">
+      <defs>
+        <filter id="grain-filter-2">
+          <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="2" seed="2"/>
+        </filter>
+      </defs>
+      <rect id="grain-2" class="grain" x="0" y="0" width="1920" height="1080" fill="#f3ead6" opacity="0" filter="url(#grain-filter-2)"/>
+
+      <g id="history-art">
+        <!-- Calendar page -->
+        <g id="calendar-art">
+          <path id="calendar-outline-a" class="draw" pathLength="1" d="M204 243 L211 228 L543 231 L559 246 L555 544 L541 558 L215 553 L202 538 Z" fill="none" stroke="#2b2623" stroke-width="7"/>
+          <path id="calendar-header" class="draw" pathLength="1" d="M205 292 L555 296" fill="none" stroke="#d64933" stroke-width="7"/>
+          <path id="calendar-ring-1" class="draw" pathLength="1" d="M278 208 Q270 201 273 187 Q276 171 290 175 Q302 180 298 195 Q297 208 286 210 Q279 210 278 208 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+          <path id="calendar-ring-2" class="draw" pathLength="1" d="M450 210 Q442 202 446 186 Q450 170 463 176 Q474 182 470 197 Q469 208 458 211 Q452 211 450 210 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+          <path id="calendar-top" class="draw" pathLength="1" d="M221 221 L532 224 L536 243 L220 239 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+        </g>
+
+        <!-- Five planes in their own animation wrappers -->
+        <g id="plane-1" class="pop plane-symbol" transform="translate(200 760)">
+          <use href="#plane" x="-62" y="-48" width="125" height="96"/>
+        </g>
+        <g id="plane-2" class="pop plane-symbol" transform="translate(320 760)">
+          <use href="#plane" x="-62" y="-48" width="125" height="96"/>
+        </g>
+        <g id="plane-3" class="pop plane-symbol" transform="translate(440 760)">
+          <use href="#plane" x="-62" y="-48" width="125" height="96"/>
+        </g>
+        <g id="plane-4" class="pop plane-symbol" transform="translate(560 760)">
+          <use href="#plane" x="-62" y="-48" width="125" height="96"/>
+        </g>
+        <g id="plane-5" class="pop plane-symbol" transform="translate(680 760)">
+          <use href="#plane" x="-62" y="-48" width="125" height="96"/>
+        </g>
+
+        <!-- Vanishing clouds -->
+        <g id="poof-1" class="pop" transform="translate(200 760)">
+          <path class="draw static" pathLength="1" d="M-34 4 Q-46 -8 -34 -20 Q-19 -30 -8 -16 Q6 -32 19 -17 Q35 -20 39 -3 Q42 13 23 14 L-21 15 Q-42 17 -34 4 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+          <path class="draw static" pathLength="1" d="M-48 -31 L-57 -41 M0 -39 L0 -52 M43 -28 L53 -38" fill="none" stroke="#d64933" stroke-width="5"/>
+        </g>
+        <g id="poof-2" class="pop" transform="translate(320 760)">
+          <path class="draw static" pathLength="1" d="M-34 4 Q-46 -8 -34 -20 Q-19 -30 -8 -16 Q6 -32 19 -17 Q35 -20 39 -3 Q42 13 23 14 L-21 15 Q-42 17 -34 4 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+          <path class="draw static" pathLength="1" d="M-48 -31 L-57 -41 M0 -39 L0 -52 M43 -28 L53 -38" fill="none" stroke="#d64933" stroke-width="5"/>
+        </g>
+        <g id="poof-3" class="pop" transform="translate(440 760)">
+          <path class="draw static" pathLength="1" d="M-34 4 Q-46 -8 -34 -20 Q-19 -30 -8 -16 Q6 -32 19 -17 Q35 -20 39 -3 Q42 13 23 14 L-21 15 Q-42 17 -34 4 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+          <path class="draw static" pathLength="1" d="M-48 -31 L-57 -41 M0 -39 L0 -52 M43 -28 L53 -38" fill="none" stroke="#d64933" stroke-width="5"/>
+        </g>
+        <g id="poof-4" class="pop" transform="translate(560 760)">
+          <path class="draw static" pathLength="1" d="M-34 4 Q-46 -8 -34 -20 Q-19 -30 -8 -16 Q6 -32 19 -17 Q35 -20 39 -3 Q42 13 23 14 L-21 15 Q-42 17 -34 4 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+          <path class="draw static" pathLength="1" d="M-48 -31 L-57 -41 M0 -39 L0 -52 M43 -28 L53 -38" fill="none" stroke="#d64933" stroke-width="5"/>
+        </g>
+        <g id="poof-5" class="pop" transform="translate(680 760)">
+          <path class="draw static" pathLength="1" d="M-34 4 Q-46 -8 -34 -20 Q-19 -30 -8 -16 Q6 -32 19 -17 Q35 -20 39 -3 Q42 13 23 14 L-21 15 Q-42 17 -34 4 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+          <path class="draw static" pathLength="1" d="M-48 -31 L-57 -41 M0 -39 L0 -52 M43 -28 L53 -38" fill="none" stroke="#d64933" stroke-width="5"/>
+        </g>
+
+        <!-- Compass outline, second sketch, and needle -->
+        <g id="compass-art">
+          <path id="compass-ring-a" class="draw" pathLength="1" d="M1500 250 Q1589 250 1645 315 Q1707 379 1676 464 Q1655 539 1580 579 Q1500 619 1423 577 Q1343 539 1322 456 Q1300 376 1356 309 Q1413 251 1500 250 Z" fill="none" stroke="#2b2623" stroke-width="7"/>
+          <path id="compass-ring-b" class="draw" pathLength="1" d="M1508 255 Q1595 259 1651 321 Q1710 386 1680 470 Q1653 545 1576 584 Q1498 622 1418 582 Q1340 542 1318 450 Q1306 370 1363 304 Q1420 248 1508 255 Z" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+
+          <g id="needle">
+            <path class="draw static" pathLength="1" d="M1500 420 L1487 282 L1503 399 Z" fill="none" stroke="#d64933" stroke-width="8"/>
+            <path class="draw static" pathLength="1" d="M1500 420 L1514 558 L1497 437 Z" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="8"/>
+            <path class="draw static" pathLength="1" d="M1500 405 Q1513 406 1515 420 Q1514 433 1500 435 Q1486 433 1487 420 Q1487 407 1500 405 Z" fill="#f2b940" stroke="#2b2623" stroke-width="5"/>
+          </g>
+
+          <g id="compass-shake">
+            <path id="compass-shake-a" class="draw static" pathLength="1" d="M1290 335 L1269 317 M1289 355 L1261 350 M1691 327 L1713 310 M1697 351 L1725 347" fill="none" stroke="#d64933" stroke-width="6"/>
+            <path id="compass-shake-b" class="draw static" pathLength="1" d="M1306 529 L1284 548 M1690 527 L1712 546 M1500 229 L1500 207" fill="none" stroke="#d64933" stroke-width="6"/>
+          </g>
+        </g>
+      </g>
+
+      <!-- Question scene illustration -->
+      <g id="question-art">
+        <g id="magnifier-art">
+          <path id="magnifier-ring" class="draw" pathLength="1" d="M1491 408 Q1493 353 1547 350 Q1599 351 1601 406 Q1600 460 1548 462 Q1490 461 1491 408 Z" fill="none" stroke="#2f6f9f" stroke-width="8"/>
+          <path id="magnifier-ring-double" class="draw" pathLength="1" d="M1498 412 Q1499 361 1547 358 Q1592 360 1594 406 Q1595 454 1548 455 Q1497 454 1498 412 Z" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="magnifier-handle" class="draw" pathLength="1" d="M1590 451 L1668 532 L1655 547 L1579 464" fill="none" stroke="#2b2623" stroke-width="9"/>
+        </g>
+      </g>
+    </svg>
+
+    <!-- Shot 2.1 to 2.3 -->
+    <div id="texts2-history" class="text-layer">
+      <div id="flight-kicker" class="pop marker kicker mustard" style="position:absolute; left:120px; top:115px;">
+        <span class="w">FLIGHT</span> <span class="w">19</span>
+      </div>
+
+      <div id="calendar-dec" class="pop marker headline red" style="position:absolute; left:255px; top:318px; font-size:44px;">
+        <span class="w">DEC</span>
+      </div>
+      <div id="calendar-five" class="pop marker display" style="position:absolute; left:320px; top:365px; font-size:125px;">
+        <span class="w">5</span>
+      </div>
+
+      <div id="date-line" class="marker display" style="position:absolute; left:680px; top:250px; width:1000px; font-size:67px;">
+        <span id="date-december" class="word-pop w">DECEMBER</span><br>
+        <span id="date-five" class="word-pop w red">5,</span>
+        <span id="date-year" class="word-pop w">1945</span>
+      </div>
+
+      <div id="formation-copy" class="pop marker headline" style="position:absolute; left:120px; top:600px; width:900px;">
+        <span class="w">FIVE</span> <span class="w">NAVY</span> <span class="w">AVENGERS</span><br>
+        <span class="w red">ROUTINE</span> <span class="w red">TRAINING</span><br>
+        <span class="w red">MISSION</span>
+      </div>
+
+      <div id="compass-north" class="pop marker headline" style="position:absolute; left:1467px; top:180px; font-size:40px;">
+        <span class="w">N</span>
+      </div>
+      <div id="compass-east" class="pop marker headline" style="position:absolute; left:1691px; top:390px; font-size:40px;">
+        <span class="w">E</span>
+      </div>
+      <div id="compass-south" class="pop marker headline" style="position:absolute; left:1483px; top:575px; font-size:40px;">
+        <span class="w">S</span>
+      </div>
+      <div id="compass-west" class="pop marker headline" style="position:absolute; left:1287px; top:390px; font-size:40px;">
+        <span class="w">W</span>
+      </div>
+
+      <div id="compass-label" class="pop marker subhead red" style="position:absolute; left:1175px; top:670px; width:650px; text-align:center;">
+        <span class="w">COMPASSES</span><br>
+        <span class="w">SPIN</span> <span class="w">WILDLY</span>
+      </div>
+
+      <div id="compass-small-label" class="pop marker kicker blue" style="position:absolute; left:1300px; top:740px;">
+        <span class="w">LOST</span> <span class="w">BEARING?</span>
+      </div>
+    </div>
+
+    <!-- Shot 2.4 -->
+    <div id="texts2-question" class="text-layer">
+      <div id="question-but" class="pop marker headline" style="position:absolute; left:120px; top:230px; font-size:75px;">
+        <span class="w">BUT</span> <span class="w">IS</span> <span class="w">IT</span>
+      </div>
+      <div id="question-danger" class="pop marker display red" style="position:absolute; left:120px; top:335px; width:980px; font-size:76px;">
+        <span class="w">ACTUALLY</span><br>
+        <span class="w">DANGEROUS?</span>
+      </div>
+      <div id="danger-underline" class="text-layer" style="position:absolute; inset:0;">
+        <div id="underline-stroke-a" style="position:absolute; left:130px; top:448px; width:570px;"></div>
+      </div>
+      <div id="question-evidence" class="pop marker subhead mustard" style="position:absolute; left:120px; top:535px; width:900px;">
+        <span class="w">THE</span> <span class="w">EVIDENCE</span><br>
+        <span class="w">SAYS</span> <span class="w">OTHERWISE</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCENE 3: THE REALITY -->
+  <section id="scene-3" class="clip" data-start="26.5" data-duration="19.5">
+    <div class="paper" id="paper-3"></div>
+
+    <svg id="art-3" class="art" viewBox="0 0 1920 1080" style="position:absolute; inset:0; width:100%; height:100%;" aria-hidden="true">
+      <defs>
+        <filter id="grain-filter-3">
+          <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="2" seed="7"/>
+        </filter>
+      </defs>
+      <rect id="grain-3" class="grain" x="0" y="0" width="1920" height="1080" fill="#f3ead6" opacity="0" filter="url(#grain-filter-3)"/>
+
+      <!-- Shot 3.1: comparison chart -->
+      <g id="comparison-art">
+        <path id="chart-baseline" class="draw" pathLength="1" d="M270 761 L1635 761 L1647 766" fill="none" stroke="#2b2623" stroke-width="8"/>
+
+        <path id="bar-bermuda-outline" class="draw" pathLength="1" d="M420 759 L419 416 L437 408 L700 411 L721 421 L719 758" fill="none" stroke="#2b2623" stroke-width="8"/>
+        <path id="bar-bermuda-hatch-1" class="draw" pathLength="1" d="M430 725 L690 425" fill="none" stroke="#d64933" stroke-width="5"/>
+        <path id="bar-bermuda-hatch-2" class="draw" pathLength="1" d="M431 679 L662 413" fill="none" stroke="#d64933" stroke-width="5"/>
+        <path id="bar-bermuda-hatch-3" class="draw" pathLength="1" d="M452 757 L717 453" fill="none" stroke="#d64933" stroke-width="5"/>
+        <path id="bar-bermuda-hatch-4" class="draw" pathLength="1" d="M500 757 L717 508" fill="none" stroke="#d64933" stroke-width="5"/>
+        <path id="bar-bermuda-hatch-5" class="draw" pathLength="1" d="M548 758 L717 562" fill="none" stroke="#d64933" stroke-width="5"/>
+        <path id="bar-bermuda-hatch-6" class="draw" pathLength="1" d="M600 758 L718 616" fill="none" stroke="#d64933" stroke-width="5"/>
+        <path id="bar-bermuda-hatch-7" class="draw" pathLength="1" d="M650 758 L718 674" fill="none" stroke="#d64933" stroke-width="5"/>
+
+        <path id="bar-ocean-outline" class="draw" pathLength="1" d="M1000 758 L1001 419 L1018 410 L1286 414 L1301 425 L1298 758" fill="none" stroke="#2b2623" stroke-width="8"/>
+        <path id="bar-ocean-hatch-1" class="draw" pathLength="1" d="M1010 730 L1273 428" fill="none" stroke="#2f6f9f" stroke-width="5"/>
+        <path id="bar-ocean-hatch-2" class="draw" pathLength="1" d="M1010 676 L1235 414" fill="none" stroke="#2f6f9f" stroke-width="5"/>
+        <path id="bar-ocean-hatch-3" class="draw" pathLength="1" d="M1036 758 L1294 463" fill="none" stroke="#2f6f9f" stroke-width="5"/>
+        <path id="bar-ocean-hatch-4" class="draw" pathLength="1" d="M1085 758 L1297 518" fill="none" stroke="#2f6f9f" stroke-width="5"/>
+        <path id="bar-ocean-hatch-5" class="draw" pathLength="1" d="M1135 758 L1297 572" fill="none" stroke="#2f6f9f" stroke-width="5"/>
+        <path id="bar-ocean-hatch-6" class="draw" pathLength="1" d="M1186 758 L1298 628" fill="none" stroke="#2f6f9f" stroke-width="5"/>
+        <path id="bar-ocean-hatch-7" class="draw" pathLength="1" d="M1236 758 L1298 682" fill="none" stroke="#2f6f9f" stroke-width="5"/>
+
+        <g id="chart-equals" class="pop">
+          <path class="draw static" pathLength="1" d="M805 525 L925 518 M805 572 L923 565" fill="none" stroke="#f2b940" stroke-width="15"/>
+          <path class="draw static" pathLength="1" d="M812 532 L927 525 M810 579 L925 572" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+        </g>
+      </g>
+
+      <!-- Shot 3.2: four culprit drawings -->
+      <g id="culprits-art">
+        <!-- Storm cloud and bolt -->
+        <g id="storm-doodle">
+          <path id="storm-cloud" class="draw" pathLength="1" d="M205 467 Q176 460 184 433 Q189 407 217 408 Q225 372 261 378 Q293 381 300 414 Q337 405 349 433 Q360 460 332 470 L210 473 Z" fill="none" stroke="#2b2623" stroke-width="8"/>
+          <path id="storm-cloud-second" class="draw" pathLength="1" d="M212 478 Q182 468 192 441 Q201 416 224 420 Q239 387 270 391 Q300 394 307 426 Q337 420 348 442" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="storm-bolt" class="draw" pathLength="1" d="M268 472 L242 524 L268 521 L253 575 L301 512 L274 515 L291 473" fill="none" stroke="#d64933" stroke-width="8"/>
+        </g>
+
+        <!-- Sun, weather cloud and question -->
+        <g id="weather-doodle">
+          <path id="weather-sun" class="draw" pathLength="1" d="M700 407 Q703 378 732 377 Q760 380 760 408 Q758 437 730 438 Q701 436 700 407 Z" fill="none" stroke="#f2b940" stroke-width="8"/>
+          <path id="weather-rays" class="draw" pathLength="1" d="M730 350 L730 331 M687 370 L670 356 M774 369 L791 354 M682 422 L662 425 M778 424 L799 428" fill="none" stroke="#f2b940" stroke-width="7"/>
+          <path id="weather-cloud" class="draw" pathLength="1" d="M666 482 Q645 466 662 446 Q678 429 696 443 Q712 414 741 431 Q763 441 762 460 Q790 452 800 474 Q802 494 779 499 L678 498 Z" fill="none" stroke="#2b2623" stroke-width="7"/>
+          <path id="weather-question" class="draw" pathLength="1" d="M817 382 Q826 361 847 369 Q866 378 853 393 L839 408 L839 420 M838 441 L838 443" fill="none" stroke="#d64933" stroke-width="8"/>
+        </g>
+
+        <!-- Current arrows -->
+        <g id="currents-doodle">
+          <path id="current-loop-1" class="draw" pathLength="1" d="M1110 420 Q1155 375 1197 411 Q1232 446 1198 480 Q1169 505 1148 480 Q1132 459 1152 441" fill="none" stroke="#2f6f9f" stroke-width="8"/>
+          <path id="current-arrow-1" class="draw" pathLength="1" d="M1148 441 L1143 462 L1165 455" fill="none" stroke="#2f6f9f" stroke-width="8"/>
+          <path id="current-loop-2" class="draw" pathLength="1" d="M1232 488 Q1270 438 1306 473 Q1331 502 1304 528 Q1287 543 1268 526" fill="none" stroke="#2f6f9f" stroke-width="8"/>
+          <path id="current-arrow-2" class="draw" pathLength="1" d="M1268 526 L1292 524 L1285 505" fill="none" stroke="#2f6f9f" stroke-width="8"/>
+          <path id="current-loop-3" class="draw" pathLength="1" d="M1095 508 Q1055 467 1085 438 Q1101 424 1120 435" fill="none" stroke="#2f6f9f" stroke-width="8"/>
+          <path id="current-arrow-3" class="draw" pathLength="1" d="M1120 435 L1104 431 L1111 453" fill="none" stroke="#2f6f9f" stroke-width="8"/>
+        </g>
+
+        <!-- A towering rogue wave and little boat -->
+        <g id="rogue-wave-doodle">
+          <path id="rogue-wave" class="draw" pathLength="1" d="M1538 555 Q1516 530 1531 497 Q1555 462 1603 472 Q1573 444 1580 408 Q1588 371 1630 361 Q1618 410 1665 430 Q1717 455 1725 493 Q1735 524 1708 554 Q1666 581 1622 555 Q1587 537 1561 555 Z" fill="none" stroke="#2f6f9f" stroke-width="9"/>
+          <path id="rogue-wave-inner" class="draw" pathLength="1" d="M1602 478 Q1637 485 1656 509 Q1672 534 1692 531" fill="none" stroke="#2f6f9f" stroke-width="6"/>
+          <path id="rogue-wave-second" class="draw" pathLength="1" d="M1528 568 Q1562 551 1594 570 T1663 568 T1734 571" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="5"/>
+          <path id="tiny-boat" class="draw" pathLength="1" d="M1618 594 L1640 610 L1695 610 L1711 595 Z M1663 593 L1663 560 L1686 589 Z" fill="none" stroke="#2b2623" stroke-width="6"/>
+        </g>
+      </g>
+
+      <!-- Shot 3.3: ghost, cross-out and storybook -->
+      <g id="ending-art">
+        <g id="ghost-main">
+          <path id="ghost-outline" class="draw" pathLength="1" d="M1390 484 L1388 367 Q1390 316 1427 291 Q1463 262 1500 291 Q1538 309 1548 354 L1548 487 L1520 467 L1497 488 L1474 467 L1452 489 L1429 469 Z" fill="none" stroke="#2b2623" stroke-width="8"/>
+          <path id="ghost-eye-a" class="draw" pathLength="1" d="M1439 365 Q1446 350 1454 364 Q1456 378 1446 381 Q1438 378 1439 365 Z" fill="none" stroke="#2b2623" stroke-width="5"/>
+          <path id="ghost-eye-b" class="draw" pathLength="1" d="M1494 365 Q1502 349 1511 365 Q1512 379 1502 381 Q1494 378 1494 365 Z" fill="none" stroke="#2b2623" stroke-width="5"/>
+          <path id="ghost-mouth" class="draw" pathLength="1" d="M1461 405 Q1474 421 1487 405" fill="none" stroke="#d64933" stroke-width="6"/>
+        </g>
+
+        <g id="ghost-cross">
+          <path id="ghost-x-a" class="draw" pathLength="1" d="M1340 287 L1609 548" fill="none" stroke="#d64933" stroke-width="13"/>
+          <path id="ghost-x-b" class="draw" pathLength="1" d="M1608 286 L1342 550" fill="none" stroke="#d64933" stroke-width="13"/>
+        </g>
+
+        <g id="ghost-faint">
+          <path class="draw static" pathLength="1" d="M1390 484 L1388 367 Q1390 316 1427 291 Q1463 262 1500 291 Q1538 309 1548 354 L1548 487 L1520 467 L1497 488 L1474 467 L1452 489 L1429 469 Z" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="7"/>
+          <path class="draw static" pathLength="1" d="M1439 365 Q1446 350 1454 364 Q1456 378 1446 381 Q1438 378 1439 365 Z M1494 365 Q1502 349 1511 365 Q1512 379 1502 381 Q1494 378 1494 365 Z" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+        </g>
+
+        <g id="storybook-art">
+          <path id="book-left-page" class="draw" pathLength="1" d="M1350 663 Q1417 643 1492 686 L1497 816 Q1428 779 1355 796 Z" fill="none" stroke="#2b2623" stroke-width="8"/>
+          <path id="book-right-page" class="draw" pathLength="1" d="M1501 687 Q1574 646 1644 665 L1639 798 Q1567 779 1498 816 Z" fill="none" stroke="#2b2623" stroke-width="8"/>
+          <path id="book-spine" class="draw" pathLength="1" d="M1497 686 L1497 816" fill="none" stroke="#d64933" stroke-width="7"/>
+          <path id="book-lines-left" class="draw" pathLength="1" d="M1377 705 Q1426 699 1469 723 M1377 735 Q1427 729 1470 751 M1380 765 Q1428 759 1472 778" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+          <path id="book-lines-right" class="draw" pathLength="1" d="M1527 723 Q1572 699 1614 708 M1527 751 Q1572 729 1613 738 M1526 779 Q1573 758 1610 768" fill="none" stroke="rgba(43,38,35,0.35)" stroke-width="4"/>
+        </g>
+      </g>
+    </svg>
+
+    <!-- Shot 3.1: factual comparison -->
+    <div id="texts3-chart" class="text-layer">
+      <div id="devils-kicker" class="pop marker kicker mustard" style="position:absolute; left:120px; top:95px;">
+        <span class="w">THE</span> <span class="w">DEVIL'S</span> <span class="w">TRIANGLE</span>
+      </div>
+      <div id="comparison-no-proof" class="pop marker display" style="position:absolute; left:120px; top:150px; font-size:82px;">
+        <span class="w">NO</span> <span class="w">PROOF</span>
+      </div>
+      <div id="comparison-risk" class="pop marker display blue" style="position:absolute; left:120px; top:242px; font-size:67px;">
+        <span class="w">OF</span> <span class="w">HIGHER</span> <span class="w">RISK</span>
+      </div>
+
+      <div id="chart-label-triangle" class="pop marker chart-label" style="position:absolute; left:380px; top:783px; width:375px;">
+        <span class="w">BERMUDA</span><br>
+        <span class="w">TRIANGLE</span>
+      </div>
+      <div id="chart-label-oceans" class="pop marker chart-label" style="position:absolute; left:960px; top:783px; width:380px;">
+        <span class="w">OTHER</span> <span class="w">BUSY</span><br>
+        <span class="w">OCEANS</span>
+      </div>
+
+      <div id="chart-subline" class="pop marker subhead" style="position:absolute; left:180px; top:875px; width:1560px; font-size:28px; text-align:center;">
+        <span class="w">NO</span> <span class="w">MORE</span> <span class="w">DISAPPEARANCES</span> <span class="w">THAN</span> <span class="w">IN</span> <span class="w">OTHER</span> <span class="w">BUSY</span> <span class="w">OCEAN</span> <span class="w">ROUTES</span>
+      </div>
+    </div>
+
+    <!-- Shot 3.2: causes -->
+    <div id="texts3-culprits" class="text-layer">
+      <div id="culprits-kicker" class="pop marker kicker mustard" style="position:absolute; left:120px; top:105px;">
+        <span class="w">THE</span> <span class="w">REAL</span> <span class="w">CULPRITS</span>
+      </div>
+
+      <div id="storm-label" class="pop marker culprit-label" style="position:absolute; left:145px; top:660px;">
+        <span class="w">STRONG</span><br>
+        <span class="w red">STORMS</span>
+      </div>
+      <div id="weather-label" class="pop marker culprit-label" style="position:absolute; left:595px; top:660px;">
+        <span class="w">UNPREDICTABLE</span><br>
+        <span class="w red">WEATHER</span>
+      </div>
+      <div id="currents-label" class="pop marker culprit-label" style="position:absolute; left:1045px; top:660px;">
+        <span class="w">POWERFUL</span><br>
+        <span class="w blue">CURRENTS</span>
+      </div>
+      <div id="waves-label" class="pop marker culprit-label" style="position:absolute; left:1495px; top:660px;">
+        <span class="w">ROGUE</span><br>
+        <span class="w blue">WAVES</span>
+      </div>
+    </div>
+
+    <!-- Shot 3.3: ending -->
+    <div id="texts3-ending" class="text-layer">
+      <div id="ending-no-supernatural" class="pop marker endline" style="position:absolute; left:115px; top:270px;">
+        <span class="w">NO</span> <span class="w">SUPERNATURAL</span><br>
+        <span class="w">MYSTERY</span>
+      </div>
+      <div id="ending-legend" class="pop marker display mustard" style="position:absolute; left:115px; top:500px; font-size:79px;">
+        <span class="w">JUST</span> <span class="w">A</span><br>
+        <span class="w">LEGEND</span>
+      </div>
+      <div id="ending-refuses" class="pop marker headline blue" style="position:absolute; left:115px; top:730px; width:970px; font-size:53px;">
+        <span class="w">THAT</span> <span class="w">REFUSES</span><br>
+        <span class="w">TO</span> <span class="w">FADE</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL OVERLAYS -->
+  <div id="fade"></div>
+
+  <div class="sub-container" style="position: absolute; bottom: 80px; left: 0; right: 0; display: flex; justify-content: center; align-items: center; pointer-events: none; z-index: 50;">
+    <div id="sub-s0" class="sub-card" style="opacity: 0; position: absolute; max-width: 1200px; padding: 12px 32px; background: rgba(15,23,42,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); border-radius: 9999px; font-size: 26px; font-weight: 700; color: #ffffff; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">The Bermuda Triangle is one of the world's most famous mysteries.</div>
+    <div id="sub-s1" class="sub-card" style="opacity: 0; position: absolute; max-width: 1200px; padding: 12px 32px; background: rgba(15,23,42,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); border-radius: 9999px; font-size: 26px; font-weight: 700; color: #ffffff; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">Located between Florida, Bermuda, and Puerto Rico, it has been linked to stories of ships and planes mysteriously disappearing.</div>
+    <div id="sub-s2" class="sub-card" style="opacity: 0; position: absolute; max-width: 1200px; padding: 12px 32px; background: rgba(15,23,42,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); border-radius: 9999px; font-size: 26px; font-weight: 700; color: #ffffff; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">One of the most famous cases happened in 1945, when five US Navy aircraft vanished during a training mission.</div>
+    <div id="sub-s3" class="sub-card" style="opacity: 0; position: absolute; max-width: 1200px; padding: 12px 32px; background: rgba(15,23,42,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); border-radius: 9999px; font-size: 26px; font-weight: 700; color: #ffffff; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">But is the area actually dangerous?</div>
+    <div id="sub-s4" class="sub-card" style="opacity: 0; position: absolute; max-width: 1200px; padding: 12px 32px; background: rgba(15,23,42,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); border-radius: 9999px; font-size: 26px; font-weight: 700; color: #ffffff; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">Scientists have found no evidence that disappearances happen here more often than in other busy parts of the ocean.</div>
+    <div id="sub-s5" class="sub-card" style="opacity: 0; position: absolute; max-width: 1200px; padding: 12px 32px; background: rgba(15,23,42,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); border-radius: 9999px; font-size: 26px; font-weight: 700; color: #ffffff; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">Strong storms, unpredictable weather, and powerful currents may explain many of the incidents.</div>
+    <div id="sub-s6" class="sub-card" style="opacity: 0; position: absolute; max-width: 1200px; padding: 12px 32px; background: rgba(15,23,42,0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.15); border-radius: 9999px; font-size: 26px; font-weight: 700; color: #ffffff; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">So, there may be no supernatural mystery after all. Just a fascinating legend that refuses to disappear.</div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    /* Deterministic paper boil: 3 texture frames at 8 fps */
+    for (let i = 0; i < 368; i++) { tl.set("#turb", { attr: { seed: (i % 3) + 1 } }, i * 0.125); }
+
+    const fixedTilts = [-3, 2, -1.5, 3];
+    tl.set(".w", { rotation: (i) => fixedTilts[i % fixedTilts.length] }, 0);
+
+    function reveal(selector, at, duration = 0.125) {
+      const n = Math.max(1, Math.round(duration * 8));
+      tl.fromTo(selector, { opacity: 0 }, {
+        opacity: 1,
+        duration: duration,
+        ease: "steps(" + n + ")"
+      }, at);
+    }
+
+    function hide(selector, at, duration = 0.125) {
+      const n = Math.max(1, Math.round(duration * 8));
+      tl.to(selector, {
+        opacity: 0,
+        duration: duration,
+        ease: "steps(" + n + ")"
+      }, at);
+    }
+
+    function drawOn(selector, at, duration) {
+      const n = Math.max(1, Math.round(duration * 8));
+      tl.set(selector, { opacity: 1 }, at);
+      tl.fromTo(selector, { strokeDashoffset: 1 }, {
+        strokeDashoffset: 0,
+        duration: duration,
+        ease: "steps(" + n + ")"
+      }, at);
+    }
+
+    function bob(selector, start, end) {
+      let frame = 0;
+      for (let t = start + 0.25; t < end; t += 0.25) {
+        tl.set(selector, { y: frame % 2 === 0 ? 8 : -8 }, t);
+        frame++;
+      }
+    }
+
+    /* SCENE 1 — Shot 1.1 */
+    reveal("#case-kicker", 0.5);
+    reveal("#title-bermuda", 0.9);
+    reveal("#title-triangle", 1.4);
+
+    drawOn("#tri-title-a", 1.0, 0.5);
+    drawOn("#tri-title-b", 1.6, 0.5);
+    drawOn("#tri-title-c", 2.2, 0.5);
+    drawOn("#sea-title", 2.8, 0.8);
+
+    reveal("#title-tagline", 2.8);
+    reveal("#title-question", 4.0);
+    bob("#title-question", 4.0, 5.3);
+
+    hide("#case-kicker", 5.3);
+    hide("#title-bermuda", 5.425);
+    hide("#title-triangle", 5.55);
+    hide("#title-tagline", 5.675);
+    hide("#title-question", 5.8);
+    hide("#title-triangle", 5.3);
+    hide("#title-triangle", 5.3);
+    hide("#tri-title-a", 5.3);
+    hide("#tri-title-b", 5.425);
+    hide("#tri-title-c", 5.55);
+    hide("#sea-title", 5.675);
+
+    /* SCENE 1 — Shot 1.2 */
+    reveal("#map-kicker", 6.0);
+
+    drawOn("#florida-draw", 6.2, 0.6);
+    drawOn("#bermuda-draw", 7.0, 0.5);
+    drawOn("#puerto-draw", 7.8, 0.5);
+
+    reveal("#map-label-florida", 6.4);
+    reveal("#map-label-bermuda", 7.4);
+    reveal("#map-label-puerto", 8.4);
+
+    drawOn("#map-wave-a", 7.8, 0.4);
+    drawOn("#map-wave-b", 8.0, 0.4);
+    drawOn("#map-wave-c", 8.1, 0.4);
+    drawOn("#map-wave-d", 8.3, 0.4);
+
+    reveal("#dot-florida", 6.3);
+    reveal("#dot-bermuda", 7.3);
+    reveal("#dot-puerto", 8.3);
+
+    drawOn("#map-line-a", 8.8, 0.5);
+    drawOn("#map-line-b", 9.3, 0.5);
+    drawOn("#map-line-c", 9.8, 0.5);
+
+    hide("#map-kicker", 10.3);
+    hide("#map-label-florida", 10.3);
+    hide("#map-label-bermuda", 10.425);
+    hide("#map-label-puerto", 10.55);
+    hide("#florida-draw", 10.3);
+    hide("#bermuda-draw", 10.425);
+    hide("#puerto-draw", 10.55);
+    hide("#map-wave-a", 10.3);
+    hide("#map-wave-b", 10.425);
+    hide("#map-wave-c", 10.55);
+    hide("#map-wave-d", 10.675);
+
+    /* SCENE 1 — Shot 1.3 */
+    drawOn("#hatch-1", 10.4, 0.125);
+    drawOn("#hatch-2", 10.5, 0.125);
+    drawOn("#hatch-3", 10.6, 0.125);
+    drawOn("#hatch-4", 10.7, 0.125);
+    drawOn("#hatch-5", 10.8, 0.125);
+    drawOn("#hatch-6", 10.9, 0.125);
+    drawOn("#hatch-7", 11.0, 0.125);
+    drawOn("#hatch-8", 11.1, 0.125);
+    drawOn("#hatch-9", 11.2, 0.125);
+    drawOn("#hatch-10", 11.3, 0.125);
+
+    reveal("#stat-area", 10.6);
+    reveal("#stat-caption", 11.2);
+
+    reveal("#ship-1", 11.0);
+    reveal("#ship-2", 11.3);
+    reveal("#ship-3", 11.6);
+    drawOn("#ship-x-a", 11.5, 0.125);
+    drawOn("#ship-x-b", 11.8, 0.125);
+    drawOn("#ship-x-c", 12.1, 0.125);
+
+    reveal("#map-plane-1", 11.9);
+    reveal("#map-plane-2", 12.2);
+    drawOn("#plane-x-a", 12.4, 0.125);
+    drawOn("#plane-x-b", 12.7, 0.125);
+
+    hide("#stat-area", 13.875);
+    hide("#stat-caption", 13.9);
+    hide("#map-overlay-art", 14.0);
+    hide("#texts1-title", 14.0);
+    hide("#texts1-map", 14.0);
+    hide("#texts1-number", 14.0);
+
+    /* SCENE 2 — paper reveal and Shot 2.1 */
+    reveal("#paper-2", 14.5);
+    tl.set("#grain-2", { opacity: 0.08 }, 14.5);
+
+    reveal("#flight-kicker", 14.9);
+    drawOn("#calendar-outline-a", 15.0, 0.7);
+    drawOn("#calendar-header", 15.1, 0.5);
+    drawOn("#calendar-ring-1", 15.0, 0.4);
+    drawOn("#calendar-ring-2", 15.1, 0.4);
+    drawOn("#calendar-top", 15.2, 0.4);
+
+    reveal("#calendar-dec", 15.4);
+    reveal("#calendar-five", 15.8);
+    reveal("#date-december", 15.2);
+    reveal("#date-five", 15.6);
+    reveal("#date-year", 16.0);
+
+    /* SCENE 2 — Shot 2.2 */
+    reveal("#formation-copy", 16.6);
+
+    reveal("#plane-1", 17.0);
+    reveal("#plane-2", 17.2);
+    reveal("#plane-3", 17.4);
+    reveal("#plane-4", 17.6);
+    reveal("#plane-5", 17.8);
+
+    bob("#plane-1", 17.0, 20.0);
+    bob("#plane-2", 17.2, 20.6);
+    bob("#plane-3", 17.4, 21.2);
+    bob("#plane-4", 17.6, 21.8);
+    bob("#plane-5", 17.8, 22.4);
+
+    /* SCENE 2 — Shot 2.3 */
+    drawOn("#compass-ring-a", 17.6, 0.7);
+    drawOn("#compass-ring-b", 17.7, 0.6);
+
+    reveal("#compass-north", 18.0);
+    reveal("#compass-east", 18.1);
+    reveal("#compass-south", 18.2);
+    reveal("#compass-west", 18.3);
+    reveal("#compass-shake", 18.0);
+    reveal("#compass-label", 18.4);
+    reveal("#compass-small-label", 18.7);
+
+    drawOn("#needle .draw", 17.8, 0.25);
+    tl.set("#needle", { svgOrigin: "1500 420", rotation: 0 }, 18.0);
+    tl.to("#needle", { rotation: 35, duration: 0.55, ease: "steps(4)" }, 18.0);
+    tl.to("#needle", { rotation: -80, duration: 0.55, ease: "steps(4)" }, 18.55);
+    tl.to("#needle", { rotation: 140, duration: 0.55, ease: "steps(4)" }, 19.1);
+    tl.to("#needle", { rotation: -30, duration: 0.55, ease: "steps(4)" }, 19.65);
+    tl.to("#needle", { rotation: 220, duration: 0.55, ease: "steps(4)" }, 20.2);
+    tl.to("#needle", { rotation: -150, duration: 0.55, ease: "steps(4)" }, 20.75);
+    tl.to("#needle", { rotation: 90, duration: 1.1, ease: "steps(9)" }, 21.3);
+
+    hide("#plane-1", 20.0);
+    reveal("#poof-1", 20.0);
+    hide("#poof-1", 20.375);
+
+    hide("#plane-2", 20.6);
+    reveal("#poof-2", 20.6);
+    hide("#poof-2", 20.975);
+
+    hide("#plane-3", 21.2);
+    reveal("#poof-3", 21.2);
+    hide("#poof-3", 21.575);
+
+    hide("#plane-4", 21.8);
+    reveal("#poof-4", 21.8);
+    hide("#poof-4", 22.175);
+
+    hide("#plane-5", 22.4);
+    reveal("#poof-5", 22.4);
+    hide("#poof-5", 22.775);
+
+    hide("#history-art", 22.5);
+    hide("#texts2-history", 22.5);
+
+    /* SCENE 2 — Shot 2.4 */
+    reveal("#question-but", 22.9);
+    reveal("#question-danger", 23.3);
+
+    drawOn("#underline-stroke-a", 23.9, 0.5);
+    reveal("#question-evidence", 24.5);
+    drawOn("#magnifier-ring", 24.7, 0.5);
+    drawOn("#magnifier-ring-double", 24.85, 0.5);
+    drawOn("#magnifier-handle", 25.0, 0.4);
+
+    hide("#question-art", 26.0);
+    hide("#texts2-question", 26.0);
+
+    /* SCENE 3 — paper reveal and Shot 3.1 */
+    reveal("#paper-3", 26.5);
+    tl.set("#grain-3", { opacity: 0.08 }, 26.5);
+
+    reveal("#devils-kicker", 26.9);
+    reveal("#comparison-no-proof", 27.2);
+    reveal("#comparison-risk", 27.6);
+
+    drawOn("#chart-baseline", 28.0, 0.5);
+    drawOn("#bar-bermuda-outline", 28.4, 0.7);
+    drawOn("#bar-bermuda-hatch-1", 28.5, 0.5);
+    drawOn("#bar-bermuda-hatch-2", 28.55, 0.5);
+    drawOn("#bar-bermuda-hatch-3", 28.6, 0.5);
+    drawOn("#bar-bermuda-hatch-4", 28.65, 0.5);
+    drawOn("#bar-bermuda-hatch-5", 28.7, 0.5);
+    drawOn("#bar-bermuda-hatch-6", 28.75, 0.5);
+    drawOn("#bar-bermuda-hatch-7", 28.8, 0.5);
+
+    reveal("#chart-label-triangle", 29.0);
+
+    drawOn("#bar-ocean-outline", 29.4, 0.7);
+    drawOn("#bar-ocean-hatch-1", 29.45, 0.5);
+    drawOn("#bar-ocean-hatch-2", 29.5, 0.5);
+    drawOn("#bar-ocean-hatch-3", 29.55, 0.5);
+    drawOn("#bar-ocean-hatch-4", 29.6, 0.5);
+    drawOn("#bar-ocean-hatch-5", 29.65, 0.5);
+    drawOn("#bar-ocean-hatch-6", 29.7, 0.5);
+    drawOn("#bar-ocean-hatch-7", 29.75, 0.5);
+
+    reveal("#chart-label-oceans", 30.0);
+    reveal("#chart-equals", 30.6);
+    reveal("#chart-subline", 31.0);
+
+    hide("#comparison-art", 32.4);
+    hide("#texts3-chart", 32.4);
+
+    /* SCENE 3 — Shot 3.2 */
+    reveal("#culprits-kicker", 33.0);
+
+    drawOn("#storm-cloud", 33.1, 0.6);
+    drawOn("#storm-cloud-second", 33.2, 0.5);
+    drawOn("#storm-bolt", 33.35, 0.45);
+    reveal("#storm-label", 33.8);
+
+    drawOn("#weather-sun", 34.3, 0.35);
+    drawOn("#weather-rays", 34.35, 0.4);
+    drawOn("#weather-cloud", 34.45, 0.5);
+    drawOn("#weather-question", 34.55, 0.4);
+    reveal("#weather-label", 35.0);
+
+    drawOn("#current-loop-1", 35.5, 0.45);
+    drawOn("#current-arrow-1", 35.65, 0.3);
+    drawOn("#current-loop-2", 35.7, 0.45);
+    drawOn("#current-arrow-2", 35.85, 0.3);
+    drawOn("#current-loop-3", 35.9, 0.45);
+    drawOn("#current-arrow-3", 36.05, 0.3);
+    reveal("#currents-label", 36.2);
+
+    drawOn("#rogue-wave", 36.7, 0.6);
+    drawOn("#rogue-wave-inner", 36.85, 0.45);
+    drawOn("#rogue-wave-second", 36.95, 0.4);
+    drawOn("#tiny-boat", 37.1, 0.35);
+    reveal("#waves-label", 37.4);
+
+    hide("#culprits-art", 38.5);
+    hide("#texts3-culprits", 38.5);
+
+    /* SCENE 3 — Shot 3.3 */
+    reveal("#ending-no-supernatural", 39.2);
+
+    drawOn("#ghost-outline", 39.4, 0.8);
+    drawOn("#ghost-eye-a", 39.65, 0.35);
+    drawOn("#ghost-eye-b", 39.7, 0.35);
+    drawOn("#ghost-mouth", 39.8, 0.25);
+
+    drawOn("#ghost-x-a", 40.4, 0.25);
+    drawOn("#ghost-x-b", 40.65, 0.25);
+
+    reveal("#ending-legend", 41.0);
+    drawOn("#book-left-page", 41.0, 0.8);
+    drawOn("#book-right-page", 41.1, 0.7);
+    drawOn("#book-spine", 41.35, 0.35);
+    drawOn("#book-lines-left", 41.5, 0.3);
+    drawOn("#book-lines-right", 41.55, 0.3);
+    reveal("#ending-refuses", 42.5);
+
+    reveal("#ghost-faint", 43.2);
+    hide("#ghost-faint", 43.325);
+    reveal("#ghost-faint", 43.45);
+    hide("#ghost-faint", 43.575);
+    reveal("#ghost-faint", 43.7);
+
+    /* Hard-cut flickers between paper scenes */
+    tl.fromTo("#fade", { opacity: 0 }, {
+      opacity: 1,
+      duration: 0.25,
+      ease: "steps(2)"
+    }, 14.25);
+    tl.fromTo("#fade", { opacity: 1 }, {
+      opacity: 0,
+      duration: 0.25,
+      ease: "steps(2)"
+    }, 14.5);
+
+    tl.fromTo("#fade", { opacity: 0 }, {
+      opacity: 1,
+      duration: 0.25,
+      ease: "steps(2)"
+    }, 26.25);
+    tl.fromTo("#fade", { opacity: 1 }, {
+      opacity: 0,
+      duration: 0.25,
+      ease: "steps(2)"
+    }, 26.5);
+
+    /* Final dip to ink */
+    tl.fromTo("#fade", { opacity: 0 }, {
+      opacity: 1,
+      duration: 0.9,
+      ease: "steps(7)"
+    }, 44.6);
+
+    /* Seven synchronized voiceover subtitle cards */
+    tl.fromTo("#sub-s0", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 0.29);
+    tl.to("#sub-s0", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 5.26);
+
+    tl.fromTo("#sub-s1", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 5.85);
+    tl.to("#sub-s1", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 13.87);
+
+    tl.fromTo("#sub-s2", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 14.12);
+    tl.to("#sub-s2", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 22.57);
+
+    tl.fromTo("#sub-s3", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 22.82);
+    tl.to("#sub-s3", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 26.49);
+
+    tl.fromTo("#sub-s4", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 26.74);
+    tl.to("#sub-s4", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 32.45);
+
+    tl.fromTo("#sub-s5", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 32.70);
+    tl.to("#sub-s5", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 38.62);
+
+    tl.fromTo("#sub-s6", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 38.89);
+    tl.to("#sub-s6", { opacity: 0, y: -10, duration: 0.25, ease: "power2.in" }, 45.16);
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["main"] = tl;
+  </script>
+</div>
+</body>
+</html>

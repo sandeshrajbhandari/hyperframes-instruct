@@ -1,0 +1,1311 @@
+{
+  "duration": 45.84,
+  "sentences": [
+    {
+      "id": "s0",
+      "text": "The Bermuda Triangle is one of the world's most famous mysteries.",
+      "start": 0.29,
+      "end": 5.51,
+      "words": [
+        {
+          "id": "w0",
+          "text": "The",
+          "start": 0.29,
+          "end": 0.33
+        },
+        {
+          "id": "w1",
+          "text": "Bermuda",
+          "start": 0.33,
+          "end": 0.96
+        },
+        {
+          "id": "w2",
+          "text": "Triangle",
+          "start": 0.96,
+          "end": 1.72
+        },
+        {
+          "id": "w3",
+          "text": "is",
+          "start": 1.73,
+          "end": 1.92
+        },
+        {
+          "id": "w4",
+          "text": "one",
+          "start": 1.92,
+          "end": 2.21
+        },
+        {
+          "id": "w5",
+          "text": "of",
+          "start": 2.21,
+          "end": 2.4
+        },
+        {
+          "id": "w6",
+          "text": "the",
+          "start": 2.4,
+          "end": 2.69
+        },
+        {
+          "id": "w7",
+          "text": "world's",
+          "start": 2.69,
+          "end": 3.36
+        },
+        {
+          "id": "w8",
+          "text": "most",
+          "start": 3.36,
+          "end": 3.74
+        },
+        {
+          "id": "w9",
+          "text": "famous",
+          "start": 3.74,
+          "end": 4.32
+        },
+        {
+          "id": "w10",
+          "text": "mysteries.",
+          "start": 4.32,
+          "end": 5.51
+        }
+      ]
+    },
+    {
+      "id": "s1",
+      "text": "Located between Florida, Bermuda, and Puerto Rico, it has been linked to stories of ships and planes mysteriously disappearing.",
+      "start": 5.85,
+      "end": 14.12,
+      "words": [
+        {
+          "id": "w11",
+          "text": "Located",
+          "start": 5.85,
+          "end": 5.93
+        },
+        {
+          "id": "w12",
+          "text": "between",
+          "start": 5.93,
+          "end": 6.34
+        },
+        {
+          "id": "w13",
+          "text": "Florida,",
+          "start": 6.34,
+          "end": 6.84
+        },
+        {
+          "id": "w14",
+          "text": "Bermuda,",
+          "start": 6.86,
+          "end": 7.38
+        },
+        {
+          "id": "w15",
+          "text": "and",
+          "start": 7.38,
+          "end": 7.54
+        },
+        {
+          "id": "w16",
+          "text": "Puerto",
+          "start": 7.55,
+          "end": 7.9
+        },
+        {
+          "id": "w17",
+          "text": "Rico,",
+          "start": 7.9,
+          "end": 8.31
+        },
+        {
+          "id": "w18",
+          "text": "it",
+          "start": 8.32,
+          "end": 8.47
+        },
+        {
+          "id": "w19",
+          "text": "has",
+          "start": 8.47,
+          "end": 8.69
+        },
+        {
+          "id": "w20",
+          "text": "been",
+          "start": 8.69,
+          "end": 8.98
+        },
+        {
+          "id": "w21",
+          "text": "linked",
+          "start": 8.98,
+          "end": 9.42
+        },
+        {
+          "id": "w22",
+          "text": "to",
+          "start": 9.42,
+          "end": 9.57
+        },
+        {
+          "id": "w23",
+          "text": "stories",
+          "start": 9.57,
+          "end": 9.86
+        },
+        {
+          "id": "w24",
+          "text": "of",
+          "start": 9.91,
+          "end": 10.22
+        },
+        {
+          "id": "w25",
+          "text": "ships",
+          "start": 10.55,
+          "end": 10.64
+        },
+        {
+          "id": "w26",
+          "text": "and",
+          "start": 10.64,
+          "end": 10.97
+        },
+        {
+          "id": "w27",
+          "text": "planes",
+          "start": 10.97,
+          "end": 11.48
+        },
+        {
+          "id": "w28",
+          "text": "mysteriously",
+          "start": 11.53,
+          "end": 12.66
+        },
+        {
+          "id": "w29",
+          "text": "disappearing.",
+          "start": 12.66,
+          "end": 14.12
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "text": "One of the most famous cases happened in 1945, when five US Navy aircraft vanished during a training mission.",
+      "start": 14.12,
+      "end": 22.82,
+      "words": [
+        {
+          "id": "w30",
+          "text": "One",
+          "start": 14.12,
+          "end": 14.45
+        },
+        {
+          "id": "w31",
+          "text": "of",
+          "start": 14.45,
+          "end": 14.52
+        },
+        {
+          "id": "w32",
+          "text": "the",
+          "start": 14.52,
+          "end": 14.76
+        },
+        {
+          "id": "w33",
+          "text": "most",
+          "start": 14.76,
+          "end": 15.08
+        },
+        {
+          "id": "w34",
+          "text": "famous",
+          "start": 15.08,
+          "end": 15.56
+        },
+        {
+          "id": "w35",
+          "text": "cases",
+          "start": 15.56,
+          "end": 15.96
+        },
+        {
+          "id": "w36",
+          "text": "happened",
+          "start": 15.96,
+          "end": 16.6
+        },
+        {
+          "id": "w37",
+          "text": "in",
+          "start": 16.6,
+          "end": 16.76
+        },
+        {
+          "id": "w38",
+          "text": "1945,",
+          "start": 16.76,
+          "end": 17.87
+        },
+        {
+          "id": "w39",
+          "text": "when",
+          "start": 17.88,
+          "end": 18.2
+        },
+        {
+          "id": "w40",
+          "text": "five",
+          "start": 18.2,
+          "end": 18.46
+        },
+        {
+          "id": "w41",
+          "text": "US",
+          "start": 18.46,
+          "end": 18.68
+        },
+        {
+          "id": "w42",
+          "text": "Navy",
+          "start": 18.68,
+          "end": 18.98
+        },
+        {
+          "id": "w43",
+          "text": "aircraft",
+          "start": 19.15,
+          "end": 19.64
+        },
+        {
+          "id": "w44",
+          "text": "vanished",
+          "start": 19.64,
+          "end": 20.28
+        },
+        {
+          "id": "w45",
+          "text": "during",
+          "start": 20.28,
+          "end": 20.62
+        },
+        {
+          "id": "w46",
+          "text": "a",
+          "start": 20.79,
+          "end": 20.87
+        },
+        {
+          "id": "w47",
+          "text": "training",
+          "start": 21.11,
+          "end": 21.58
+        },
+        {
+          "id": "w48",
+          "text": "mission.",
+          "start": 21.58,
+          "end": 22.27
+        },
+        {
+          "id": "w49",
+          "text": "But",
+          "start": 22.81,
+          "end": 22.82
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "text": "But is the area actually dangerous?",
+      "start": 22.82,
+      "end": 26.74,
+      "words": [
+        {
+          "id": "w50",
+          "text": "is",
+          "start": 22.82,
+          "end": 23.05
+        },
+        {
+          "id": "w51",
+          "text": "the",
+          "start": 23.05,
+          "end": 23.39
+        },
+        {
+          "id": "w52",
+          "text": "area",
+          "start": 23.39,
+          "end": 23.84
+        },
+        {
+          "id": "w53",
+          "text": "actually",
+          "start": 23.84,
+          "end": 24.74
+        },
+        {
+          "id": "w54",
+          "text": "dangerous?",
+          "start": 24.8,
+          "end": 26.2
+        },
+        {
+          "id": "w55",
+          "text": "Scientists",
+          "start": 26.53,
+          "end": 26.74
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "text": "Scientists have found no evidence that disappearances happen here more often than in other busy parts of the ocean.",
+      "start": 26.74,
+      "end": 32.7,
+      "words": [
+        {
+          "id": "w56",
+          "text": "have",
+          "start": 26.74,
+          "end": 26.95
+        },
+        {
+          "id": "w57",
+          "text": "found",
+          "start": 26.95,
+          "end": 27.19
+        },
+        {
+          "id": "w58",
+          "text": "no",
+          "start": 27.22,
+          "end": 27.32
+        },
+        {
+          "id": "w59",
+          "text": "evidence",
+          "start": 27.32,
+          "end": 27.68
+        },
+        {
+          "id": "w60",
+          "text": "that",
+          "start": 27.91,
+          "end": 27.96
+        },
+        {
+          "id": "w61",
+          "text": "disappearances",
+          "start": 27.96,
+          "end": 28.71
+        },
+        {
+          "id": "w62",
+          "text": "happen",
+          "start": 28.71,
+          "end": 29.03
+        },
+        {
+          "id": "w63",
+          "text": "here",
+          "start": 29.03,
+          "end": 29.23
+        },
+        {
+          "id": "w64",
+          "text": "more",
+          "start": 29.23,
+          "end": 29.37
+        },
+        {
+          "id": "w65",
+          "text": "often",
+          "start": 29.55,
+          "end": 29.72
+        },
+        {
+          "id": "w66",
+          "text": "than",
+          "start": 29.72,
+          "end": 29.93
+        },
+        {
+          "id": "w67",
+          "text": "in",
+          "start": 29.93,
+          "end": 30.03
+        },
+        {
+          "id": "w68",
+          "text": "other",
+          "start": 30.03,
+          "end": 30.29
+        },
+        {
+          "id": "w69",
+          "text": "busy",
+          "start": 30.29,
+          "end": 30.54
+        },
+        {
+          "id": "w70",
+          "text": "parts",
+          "start": 30.93,
+          "end": 31.05
+        },
+        {
+          "id": "w71",
+          "text": "of",
+          "start": 31.09,
+          "end": 31.24
+        },
+        {
+          "id": "w72",
+          "text": "the",
+          "start": 31.24,
+          "end": 31.52
+        },
+        {
+          "id": "w73",
+          "text": "ocean.",
+          "start": 31.52,
+          "end": 32.09
+        },
+        {
+          "id": "w74",
+          "text": "Strong",
+          "start": 32.61,
+          "end": 32.7
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "text": "Strong storms, unpredictable weather, and powerful currents may explain many of the incidents.",
+      "start": 32.7,
+      "end": 38.87,
+      "words": [
+        {
+          "id": "w75",
+          "text": "storms,",
+          "start": 32.7,
+          "end": 33.25
+        },
+        {
+          "id": "w76",
+          "text": "unpredictable",
+          "start": 33.25,
+          "end": 34.18
+        },
+        {
+          "id": "w77",
+          "text": "weather,",
+          "start": 34.18,
+          "end": 34.8
+        },
+        {
+          "id": "w78",
+          "text": "and",
+          "start": 34.81,
+          "end": 35.02
+        },
+        {
+          "id": "w79",
+          "text": "powerful",
+          "start": 35.02,
+          "end": 35.44
+        },
+        {
+          "id": "w80",
+          "text": "currents",
+          "start": 35.63,
+          "end": 36.16
+        },
+        {
+          "id": "w81",
+          "text": "may",
+          "start": 36.16,
+          "end": 36.37
+        },
+        {
+          "id": "w82",
+          "text": "explain",
+          "start": 36.37,
+          "end": 36.62
+        },
+        {
+          "id": "w83",
+          "text": "many",
+          "start": 36.66,
+          "end": 37.14
+        },
+        {
+          "id": "w84",
+          "text": "of",
+          "start": 37.14,
+          "end": 37.32
+        },
+        {
+          "id": "w85",
+          "text": "the",
+          "start": 37.32,
+          "end": 37.53
+        },
+        {
+          "id": "w86",
+          "text": "incidents.",
+          "start": 37.89,
+          "end": 38.55
+        },
+        {
+          "id": "w87",
+          "text": "So,",
+          "start": 38.57,
+          "end": 38.87
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "text": "So, there may be no supernatural mystery after all. Just a fascinating legend that refuses to disappear.",
+      "start": 38.89,
+      "end": 45.41,
+      "words": [
+        {
+          "id": "w88",
+          "text": "there",
+          "start": 38.89,
+          "end": 39.27
+        },
+        {
+          "id": "w89",
+          "text": "may",
+          "start": 39.27,
+          "end": 39.51
+        },
+        {
+          "id": "w90",
+          "text": "be",
+          "start": 39.51,
+          "end": 39.67
+        },
+        {
+          "id": "w91",
+          "text": "no",
+          "start": 39.67,
+          "end": 39.83
+        },
+        {
+          "id": "w92",
+          "text": "supernatural",
+          "start": 39.83,
+          "end": 40.78
+        },
+        {
+          "id": "w93",
+          "text": "mystery",
+          "start": 40.78,
+          "end": 41.32
+        },
+        {
+          "id": "w94",
+          "text": "after",
+          "start": 41.33,
+          "end": 41.66
+        },
+        {
+          "id": "w95",
+          "text": "all.",
+          "start": 41.7,
+          "end": 42.24
+        },
+        {
+          "id": "w96",
+          "text": "Just",
+          "start": 42.24,
+          "end": 42.57
+        },
+        {
+          "id": "w97",
+          "text": "a",
+          "start": 42.57,
+          "end": 42.59
+        },
+        {
+          "id": "w98",
+          "text": "fascinating",
+          "start": 42.59,
+          "end": 43.36
+        },
+        {
+          "id": "w99",
+          "text": "legend",
+          "start": 43.36,
+          "end": 43.72
+        },
+        {
+          "id": "w100",
+          "text": "that",
+          "start": 43.95,
+          "end": 44.06
+        },
+        {
+          "id": "w101",
+          "text": "refuses",
+          "start": 44.06,
+          "end": 44.49
+        },
+        {
+          "id": "w102",
+          "text": "to",
+          "start": 44.56,
+          "end": 44.68
+        },
+        {
+          "id": "w103",
+          "text": "disappear.",
+          "start": 44.68,
+          "end": 45.41
+        }
+      ]
+    }
+  ],
+  "words": [
+    {
+      "id": "w0",
+      "text": "The",
+      "start": 0.29,
+      "end": 0.33
+    },
+    {
+      "id": "w1",
+      "text": "Bermuda",
+      "start": 0.33,
+      "end": 0.96
+    },
+    {
+      "id": "w2",
+      "text": "Triangle",
+      "start": 0.96,
+      "end": 1.72
+    },
+    {
+      "id": "w3",
+      "text": "is",
+      "start": 1.73,
+      "end": 1.92
+    },
+    {
+      "id": "w4",
+      "text": "one",
+      "start": 1.92,
+      "end": 2.21
+    },
+    {
+      "id": "w5",
+      "text": "of",
+      "start": 2.21,
+      "end": 2.4
+    },
+    {
+      "id": "w6",
+      "text": "the",
+      "start": 2.4,
+      "end": 2.69
+    },
+    {
+      "id": "w7",
+      "text": "world's",
+      "start": 2.69,
+      "end": 3.36
+    },
+    {
+      "id": "w8",
+      "text": "most",
+      "start": 3.36,
+      "end": 3.74
+    },
+    {
+      "id": "w9",
+      "text": "famous",
+      "start": 3.74,
+      "end": 4.32
+    },
+    {
+      "id": "w10",
+      "text": "mysteries.",
+      "start": 4.32,
+      "end": 5.51
+    },
+    {
+      "id": "w11",
+      "text": "Located",
+      "start": 5.85,
+      "end": 5.93
+    },
+    {
+      "id": "w12",
+      "text": "between",
+      "start": 5.93,
+      "end": 6.34
+    },
+    {
+      "id": "w13",
+      "text": "Florida,",
+      "start": 6.34,
+      "end": 6.84
+    },
+    {
+      "id": "w14",
+      "text": "Bermuda,",
+      "start": 6.86,
+      "end": 7.38
+    },
+    {
+      "id": "w15",
+      "text": "and",
+      "start": 7.38,
+      "end": 7.54
+    },
+    {
+      "id": "w16",
+      "text": "Puerto",
+      "start": 7.55,
+      "end": 7.9
+    },
+    {
+      "id": "w17",
+      "text": "Rico,",
+      "start": 7.9,
+      "end": 8.31
+    },
+    {
+      "id": "w18",
+      "text": "it",
+      "start": 8.32,
+      "end": 8.47
+    },
+    {
+      "id": "w19",
+      "text": "has",
+      "start": 8.47,
+      "end": 8.69
+    },
+    {
+      "id": "w20",
+      "text": "been",
+      "start": 8.69,
+      "end": 8.98
+    },
+    {
+      "id": "w21",
+      "text": "linked",
+      "start": 8.98,
+      "end": 9.42
+    },
+    {
+      "id": "w22",
+      "text": "to",
+      "start": 9.42,
+      "end": 9.57
+    },
+    {
+      "id": "w23",
+      "text": "stories",
+      "start": 9.57,
+      "end": 9.86
+    },
+    {
+      "id": "w24",
+      "text": "of",
+      "start": 9.91,
+      "end": 10.22
+    },
+    {
+      "id": "w25",
+      "text": "ships",
+      "start": 10.55,
+      "end": 10.64
+    },
+    {
+      "id": "w26",
+      "text": "and",
+      "start": 10.64,
+      "end": 10.97
+    },
+    {
+      "id": "w27",
+      "text": "planes",
+      "start": 10.97,
+      "end": 11.48
+    },
+    {
+      "id": "w28",
+      "text": "mysteriously",
+      "start": 11.53,
+      "end": 12.66
+    },
+    {
+      "id": "w29",
+      "text": "disappearing.",
+      "start": 12.66,
+      "end": 14.12
+    },
+    {
+      "id": "w30",
+      "text": "One",
+      "start": 14.12,
+      "end": 14.45
+    },
+    {
+      "id": "w31",
+      "text": "of",
+      "start": 14.45,
+      "end": 14.52
+    },
+    {
+      "id": "w32",
+      "text": "the",
+      "start": 14.52,
+      "end": 14.76
+    },
+    {
+      "id": "w33",
+      "text": "most",
+      "start": 14.76,
+      "end": 15.08
+    },
+    {
+      "id": "w34",
+      "text": "famous",
+      "start": 15.08,
+      "end": 15.56
+    },
+    {
+      "id": "w35",
+      "text": "cases",
+      "start": 15.56,
+      "end": 15.96
+    },
+    {
+      "id": "w36",
+      "text": "happened",
+      "start": 15.96,
+      "end": 16.6
+    },
+    {
+      "id": "w37",
+      "text": "in",
+      "start": 16.6,
+      "end": 16.76
+    },
+    {
+      "id": "w38",
+      "text": "1945,",
+      "start": 16.76,
+      "end": 17.87
+    },
+    {
+      "id": "w39",
+      "text": "when",
+      "start": 17.88,
+      "end": 18.2
+    },
+    {
+      "id": "w40",
+      "text": "five",
+      "start": 18.2,
+      "end": 18.46
+    },
+    {
+      "id": "w41",
+      "text": "US",
+      "start": 18.46,
+      "end": 18.68
+    },
+    {
+      "id": "w42",
+      "text": "Navy",
+      "start": 18.68,
+      "end": 18.98
+    },
+    {
+      "id": "w43",
+      "text": "aircraft",
+      "start": 19.15,
+      "end": 19.64
+    },
+    {
+      "id": "w44",
+      "text": "vanished",
+      "start": 19.64,
+      "end": 20.28
+    },
+    {
+      "id": "w45",
+      "text": "during",
+      "start": 20.28,
+      "end": 20.62
+    },
+    {
+      "id": "w46",
+      "text": "a",
+      "start": 20.79,
+      "end": 20.87
+    },
+    {
+      "id": "w47",
+      "text": "training",
+      "start": 21.11,
+      "end": 21.58
+    },
+    {
+      "id": "w48",
+      "text": "mission.",
+      "start": 21.58,
+      "end": 22.27
+    },
+    {
+      "id": "w49",
+      "text": "But",
+      "start": 22.81,
+      "end": 22.82
+    },
+    {
+      "id": "w50",
+      "text": "is",
+      "start": 22.82,
+      "end": 23.05
+    },
+    {
+      "id": "w51",
+      "text": "the",
+      "start": 23.05,
+      "end": 23.39
+    },
+    {
+      "id": "w52",
+      "text": "area",
+      "start": 23.39,
+      "end": 23.84
+    },
+    {
+      "id": "w53",
+      "text": "actually",
+      "start": 23.84,
+      "end": 24.74
+    },
+    {
+      "id": "w54",
+      "text": "dangerous?",
+      "start": 24.8,
+      "end": 26.2
+    },
+    {
+      "id": "w55",
+      "text": "Scientists",
+      "start": 26.53,
+      "end": 26.74
+    },
+    {
+      "id": "w56",
+      "text": "have",
+      "start": 26.74,
+      "end": 26.95
+    },
+    {
+      "id": "w57",
+      "text": "found",
+      "start": 26.95,
+      "end": 27.19
+    },
+    {
+      "id": "w58",
+      "text": "no",
+      "start": 27.22,
+      "end": 27.32
+    },
+    {
+      "id": "w59",
+      "text": "evidence",
+      "start": 27.32,
+      "end": 27.68
+    },
+    {
+      "id": "w60",
+      "text": "that",
+      "start": 27.91,
+      "end": 27.96
+    },
+    {
+      "id": "w61",
+      "text": "disappearances",
+      "start": 27.96,
+      "end": 28.71
+    },
+    {
+      "id": "w62",
+      "text": "happen",
+      "start": 28.71,
+      "end": 29.03
+    },
+    {
+      "id": "w63",
+      "text": "here",
+      "start": 29.03,
+      "end": 29.23
+    },
+    {
+      "id": "w64",
+      "text": "more",
+      "start": 29.23,
+      "end": 29.37
+    },
+    {
+      "id": "w65",
+      "text": "often",
+      "start": 29.55,
+      "end": 29.72
+    },
+    {
+      "id": "w66",
+      "text": "than",
+      "start": 29.72,
+      "end": 29.93
+    },
+    {
+      "id": "w67",
+      "text": "in",
+      "start": 29.93,
+      "end": 30.03
+    },
+    {
+      "id": "w68",
+      "text": "other",
+      "start": 30.03,
+      "end": 30.29
+    },
+    {
+      "id": "w69",
+      "text": "busy",
+      "start": 30.29,
+      "end": 30.54
+    },
+    {
+      "id": "w70",
+      "text": "parts",
+      "start": 30.93,
+      "end": 31.05
+    },
+    {
+      "id": "w71",
+      "text": "of",
+      "start": 31.09,
+      "end": 31.24
+    },
+    {
+      "id": "w72",
+      "text": "the",
+      "start": 31.24,
+      "end": 31.52
+    },
+    {
+      "id": "w73",
+      "text": "ocean.",
+      "start": 31.52,
+      "end": 32.09
+    },
+    {
+      "id": "w74",
+      "text": "Strong",
+      "start": 32.61,
+      "end": 32.7
+    },
+    {
+      "id": "w75",
+      "text": "storms,",
+      "start": 32.7,
+      "end": 33.25
+    },
+    {
+      "id": "w76",
+      "text": "unpredictable",
+      "start": 33.25,
+      "end": 34.18
+    },
+    {
+      "id": "w77",
+      "text": "weather,",
+      "start": 34.18,
+      "end": 34.8
+    },
+    {
+      "id": "w78",
+      "text": "and",
+      "start": 34.81,
+      "end": 35.02
+    },
+    {
+      "id": "w79",
+      "text": "powerful",
+      "start": 35.02,
+      "end": 35.44
+    },
+    {
+      "id": "w80",
+      "text": "currents",
+      "start": 35.63,
+      "end": 36.16
+    },
+    {
+      "id": "w81",
+      "text": "may",
+      "start": 36.16,
+      "end": 36.37
+    },
+    {
+      "id": "w82",
+      "text": "explain",
+      "start": 36.37,
+      "end": 36.62
+    },
+    {
+      "id": "w83",
+      "text": "many",
+      "start": 36.66,
+      "end": 37.14
+    },
+    {
+      "id": "w84",
+      "text": "of",
+      "start": 37.14,
+      "end": 37.32
+    },
+    {
+      "id": "w85",
+      "text": "the",
+      "start": 37.32,
+      "end": 37.53
+    },
+    {
+      "id": "w86",
+      "text": "incidents.",
+      "start": 37.89,
+      "end": 38.55
+    },
+    {
+      "id": "w87",
+      "text": "So,",
+      "start": 38.57,
+      "end": 38.87
+    },
+    {
+      "id": "w88",
+      "text": "there",
+      "start": 38.89,
+      "end": 39.27
+    },
+    {
+      "id": "w89",
+      "text": "may",
+      "start": 39.27,
+      "end": 39.51
+    },
+    {
+      "id": "w90",
+      "text": "be",
+      "start": 39.51,
+      "end": 39.67
+    },
+    {
+      "id": "w91",
+      "text": "no",
+      "start": 39.67,
+      "end": 39.83
+    },
+    {
+      "id": "w92",
+      "text": "supernatural",
+      "start": 39.83,
+      "end": 40.78
+    },
+    {
+      "id": "w93",
+      "text": "mystery",
+      "start": 40.78,
+      "end": 41.32
+    },
+    {
+      "id": "w94",
+      "text": "after",
+      "start": 41.33,
+      "end": 41.66
+    },
+    {
+      "id": "w95",
+      "text": "all.",
+      "start": 41.7,
+      "end": 42.24
+    },
+    {
+      "id": "w96",
+      "text": "Just",
+      "start": 42.24,
+      "end": 42.57
+    },
+    {
+      "id": "w97",
+      "text": "a",
+      "start": 42.57,
+      "end": 42.59
+    },
+    {
+      "id": "w98",
+      "text": "fascinating",
+      "start": 42.59,
+      "end": 43.36
+    },
+    {
+      "id": "w99",
+      "text": "legend",
+      "start": 43.36,
+      "end": 43.72
+    },
+    {
+      "id": "w100",
+      "text": "that",
+      "start": 43.95,
+      "end": 44.06
+    },
+    {
+      "id": "w101",
+      "text": "refuses",
+      "start": 44.06,
+      "end": 44.49
+    },
+    {
+      "id": "w102",
+      "text": "to",
+      "start": 44.56,
+      "end": 44.68
+    },
+    {
+      "id": "w103",
+      "text": "disappear.",
+      "start": 44.68,
+      "end": 45.41
+    }
+  ]
+}
